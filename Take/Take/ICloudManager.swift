@@ -21,14 +21,33 @@ class ICloudManager {
                 return
             case (nil, let _):
                 _delegate?.loggedIntoiCloud?()
+                self.getUbiquityContainerURLInBackgroundQueue()
             case (let _, nil):
+                _ubiquityContainerURL = nil
                 _delegate?.loggedOutOfiCloud?()
             case let (_, _):
                 if (oldValue?.isEqual(_ubiquityIdentityToken)) {
                     return
                 } else {
+                    _ubiquityContainerURL = nil
+                    self.getUbiquityContainerURLInBackgroundQueue()
                     _delegate?.iCloudUserChanged?()
                 }
+            }
+        }
+    }
+
+    var _ubiquityContainerURL: NSURL? = nil {
+        didSet {
+            switch (oldValue, _ubiquityContainerURL) {
+            case (nil, nil):
+                return
+            case (nil, let _):
+                _delegate?.gotAccessToUbiquityContainer?()
+            case (let _, nil):
+                return
+            default:
+                return
             }
         }
     }
@@ -39,6 +58,10 @@ class ICloudManager {
 
     var isLoggedIntoiCloud: Bool {
         if (_ubiquityIdentityToken) { return true } else { return false }
+    }
+
+    var ubiquityContainerURL: NSURL? {
+        return _ubiquityContainerURL
     }
 
     // Init and Deinit
@@ -53,16 +76,34 @@ class ICloudManager {
                     strongSelf._ubiquityIdentityToken = NSFileManager.defaultManager().ubiquityIdentityToken
                 }
             })
+        if (_ubiquityIdentityToken) {
+            self.getUbiquityContainerURLInBackgroundQueue()
+        }
     }
 
     deinit {
         NSNotificationCenter.defaultCenter().removeObserver(self._iCloudTokenNotificationObserver)
     }
 
+    // Methods
+
+    func getUbiquityContainerURLInBackgroundQueue() {
+        if (_ubiquityIdentityToken) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                // In background thread
+                var url = NSFileManager.defaultManager().URLForUbiquityContainerIdentifier(ICLOUD_CONTAINER_ID)
+                dispatch_async(dispatch_get_main_queue()) {
+                    // In main thread
+                    self._ubiquityContainerURL = url
+                }
+            }
+        }
+    }
 }
 
 @objc protocol iCloudManagerDelegate {
     @optional func loggedIntoiCloud()
     @optional func loggedOutOfiCloud()
     @optional func iCloudUserChanged()
+    @optional func gotAccessToUbiquityContainer()
 }

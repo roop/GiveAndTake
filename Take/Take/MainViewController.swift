@@ -52,4 +52,5 @@ extension MainViewController: iCloudManagerDelegate {
     func loggedIntoiCloud() { NSLog("Logged into iCloud") }
     func loggedOutOfiCloud() { NSLog("Logged out of iCloud") }
     func iCloudUserChanged() { NSLog("iCloud user changed") }
+    func gotAccessToUbiquityContainer() { NSLog("Got access to Ubiquity Container") }
 }
