@@ -25,6 +25,6 @@ class MainViewController: UIViewController {
     }
 
     func addButtonTapped(sender: UIBarButtonItem!) {
-        println("Tapped")
+        self.navigationController.pushViewController(TextEditorViewController(), animated: true)
     }
 }
