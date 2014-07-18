@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6F0B3E3D1978F25D006DB765 /* ICloudManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0B3E3C1978F25D006DB765 /* ICloudManager.swift */; };
 		6F0BCB0519751AEF0016852A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0BCB0419751AEF0016852A /* AppDelegate.swift */; };
 		6F0BCB0719751AEF0016852A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F0BCB0619751AEF0016852A /* Images.xcassets */; };
 		6F0BCB1319751AEF0016852A /* TakeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0BCB1219751AEF0016852A /* TakeTests.swift */; };
 		6F0BCB1D19751B380016852A /* AutoLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0BCB1C19751B380016852A /* AutoLayoutHelper.swift */; };
 		6F0BCB1F19751B760016852A /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0BCB1E19751B760016852A /* MainViewController.swift */; };
-		6F482D101977A47700A0C0FA /* ICloudManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F482D0F1977A47700A0C0FA /* ICloudManager.swift */; };
 		6F482D121977ABBA00A0C0FA /* Defines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F482D111977ABBA00A0C0FA /* Defines.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6F0B3E3C1978F25D006DB765 /* ICloudManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ICloudManager.swift; path = Model/ICloudManager.swift; sourceTree = "<group>"; };
 		6F0BCAFF19751AEF0016852A /* Take.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Take.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F0BCB0319751AEF0016852A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F0BCB0419751AEF0016852A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -36,7 +37,6 @@
 		6F0BCB1219751AEF0016852A /* TakeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TakeTests.swift; sourceTree = "<group>"; };
 		6F0BCB1C19751B380016852A /* AutoLayoutHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoLayoutHelper.swift; sourceTree = "<group>"; };
 		6F0BCB1E19751B760016852A /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
-		6F482D0F1977A47700A0C0FA /* ICloudManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ICloudManager.swift; sourceTree = "<group>"; };
 		6F482D111977ABBA00A0C0FA /* Defines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Defines.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -58,6 +58,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6F0B3E3B1978F251006DB765 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				6F0B3E3C1978F25D006DB765 /* ICloudManager.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 		6F0BCAF619751AEF0016852A = {
 			isa = PBXGroup;
 			children = (
@@ -79,13 +87,13 @@
 		6F0BCB0119751AEF0016852A /* Take */ = {
 			isa = PBXGroup;
 			children = (
+				6F0B3E3B1978F251006DB765 /* Model */,
 				6F482D111977ABBA00A0C0FA /* Defines.swift */,
 				6F0BCB1C19751B380016852A /* AutoLayoutHelper.swift */,
 				6F0BCB0419751AEF0016852A /* AppDelegate.swift */,
 				6F0BCB0619751AEF0016852A /* Images.xcassets */,
 				6F0BCB0219751AEF0016852A /* Supporting Files */,
 				6F0BCB1E19751B760016852A /* MainViewController.swift */,
-				6F482D0F1977A47700A0C0FA /* ICloudManager.swift */,
 			);
 			path = Take;
 			sourceTree = "<group>";
@@ -216,7 +224,7 @@
 				6F0BCB1D19751B380016852A /* AutoLayoutHelper.swift in Sources */,
 				6F0BCB0519751AEF0016852A /* AppDelegate.swift in Sources */,
 				6F482D121977ABBA00A0C0FA /* Defines.swift in Sources */,
-				6F482D101977A47700A0C0FA /* ICloudManager.swift in Sources */,
+				6F0B3E3D1978F25D006DB765 /* ICloudManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
