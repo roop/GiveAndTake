@@ -21,8 +21,8 @@ class MainViewController: UIViewController {
         var navigationBar = UINavigationBar()
         navigationBar.delegate = self
         var navigationItem = UINavigationItem(title: "Take")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Open", style: .Plain,
-            target: self, action: "openButtonTapped:")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add,
+            target: self, action: "addButtonTapped:")
         navigationBar.items = [ navigationItem ]
 
         view.addSubviewsWithConstraints(
@@ -34,7 +34,7 @@ class MainViewController: UIViewController {
 
     }
 
-    func openButtonTapped(sender: UIBarButtonItem!) {
+    func addButtonTapped(sender: UIBarButtonItem!) {
         println("Tapped")
     }
 }
