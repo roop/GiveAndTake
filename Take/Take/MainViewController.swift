@@ -12,35 +12,19 @@ class MainViewController: UIViewController {
 
     init() {
         super.init(nibName: nil, bundle: nil)
+        self.navigationItem.title = "Take"
+        self.navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(barButtonSystemItem: .Add,
+                target: self, action: "addButtonTapped:")
+        ]
     }
 
     override func loadView() {
         var view = UIView()
         self.view = view
-
-        var navigationBar = UINavigationBar()
-        navigationBar.delegate = self
-        var navigationItem = UINavigationItem(title: "Take")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add,
-            target: self, action: "addButtonTapped:")
-        navigationBar.items = [ navigationItem ]
-
-        view.addSubviewsWithConstraints(
-            (navigationBar, [
-                .FillHorizontallyIn(view),
-                .Anchor(.Top, self.bottomOfTopLayoutGuide())
-                ])
-        )
-
     }
 
     func addButtonTapped(sender: UIBarButtonItem!) {
         println("Tapped")
-    }
-}
-
-extension MainViewController: UINavigationBarDelegate {
-    func positionForBar(bar: UIBarPositioning!) -> UIBarPosition {
-        return .TopAttached
     }
 }
