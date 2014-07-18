@@ -9,11 +9,9 @@
 import UIKit
 
 class MainViewController: UIViewController {
-    var iCloudManager: ICloudManager!
 
     init() {
         super.init(nibName: nil, bundle: nil)
-        iCloudManager = ICloudManager(delegate: self)
     }
 
     override func loadView() {
@@ -34,7 +32,6 @@ class MainViewController: UIViewController {
                 ])
         )
 
-        NSLog("isLoggedIntoiCloud = \(iCloudManager.isLoggedIntoiCloud)")
     }
 
     func openButtonTapped(sender: UIBarButtonItem!) {
@@ -46,11 +43,4 @@ extension MainViewController: UINavigationBarDelegate {
     func positionForBar(bar: UIBarPositioning!) -> UIBarPosition {
         return .TopAttached
     }
-}
-
-extension MainViewController: iCloudManagerDelegate {
-    func loggedIntoiCloud() { NSLog("Logged into iCloud") }
-    func loggedOutOfiCloud() { NSLog("Logged out of iCloud") }
-    func iCloudUserChanged() { NSLog("iCloud user changed") }
-    func gotAccessToUbiquityContainer() { NSLog("Got access to Ubiquity Container") }
 }
