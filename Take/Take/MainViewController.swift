@@ -9,9 +9,12 @@
 import UIKit
 
 class MainViewController: UIViewController {
+    var _documentsManager: DocumentsManager!
 
     init() {
         super.init(nibName: nil, bundle: nil)
+        _documentsManager = DocumentsManager()
+
         self.navigationItem.title = "Take"
         self.navigationItem.rightBarButtonItems = [
             UIBarButtonItem(barButtonSystemItem: .Add,
@@ -25,6 +28,8 @@ class MainViewController: UIViewController {
     }
 
     func addButtonTapped(sender: UIBarButtonItem!) {
-        self.navigationController.pushViewController(TextEditorViewController(), animated: true)
+        self.navigationController.pushViewController(
+            TextEditorViewController(documentsManager: _documentsManager),
+            animated: true)
     }
 }

@@ -38,3 +38,11 @@ extension DocumentsManager: iCloudManagerDelegate {
     func iCloudUserChanged() { NSLog("iCloud user changed") }
 
 }
+
+extension DocumentsManager {
+    func createDocument(#name: NSString) -> TextDocument {
+        var fileName = name.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
+        var url = NSURL(string: fileName, relativeToURL: _documentsRootURL)
+        return TextDocument(fileURL: url)
+    }
+}
