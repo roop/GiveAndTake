@@ -29,10 +29,10 @@ class TextDocument: UIDocument {
     }
 
     override var fileType: String! {
-        return kUTTypeUTF8PlainText
+        return kUTTypeUTF8PlainText as NSString
     }
 
     override func savingFileType() -> String! {
-        return kUTTypePlainText
+        return kUTTypePlainText as NSString
     }
 }

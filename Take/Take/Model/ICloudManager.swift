@@ -102,8 +102,8 @@ class ICloudManager {
 }
 
 @objc protocol iCloudManagerDelegate {
-    @optional func loggedIntoiCloud()
-    @optional func loggedOutOfiCloud()
-    @optional func iCloudUserChanged()
-    @optional func gotAccessToUbiquityContainer()
+    optional func loggedIntoiCloud()
+    optional func loggedOutOfiCloud()
+    optional func iCloudUserChanged()
+    optional func gotAccessToUbiquityContainer()
 }
