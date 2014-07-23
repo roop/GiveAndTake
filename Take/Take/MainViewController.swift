@@ -25,6 +25,13 @@ class MainViewController: UIViewController {
     override func loadView() {
         var view = UIView()
         self.view = view
+
+        var docCollectionVC = DocCollectionViewController(documentsManager: _documentsManager)
+        self.addChildViewController(docCollectionVC)
+        view.addSubviewsWithConstraints(
+            (docCollectionVC.view, [ .FillIn(view) ])
+        )
+        docCollectionVC.didMoveToParentViewController(self)
     }
 
     func addButtonTapped(sender: UIBarButtonItem!) {
