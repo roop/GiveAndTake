@@ -10,7 +10,7 @@ import UIKit
 
 class TextEditorViewController: UIViewController {
 
-    var _documentsManager: DocumentsManager!
+    weak var _documentsManager: DocumentsManager!
     var _document: TextDocument?
     var _title: NSMutableString = ""
     var _view: UITextView?
