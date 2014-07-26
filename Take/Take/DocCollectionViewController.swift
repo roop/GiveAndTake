@@ -79,9 +79,15 @@ class DocCollectionViewCell: UICollectionViewCell {
                 var localizedName: AnyObject?, modifiedDate: AnyObject?
                 var error: NSError?
                 docURL.getResourceValue(&localizedName, forKey: NSURLLocalizedNameKey, error: &error)
-                if (error != nil) { return }
+                if (error != nil) {
+                    println("Error while getting localizedName: \(error?.description)")
+                    return
+                }
                 docURL.getResourceValue(&modifiedDate, forKey: NSURLAttributeModificationDateKey, error: &error)
-                if (error != nil) { return }
+                if (error != nil) {
+                    println("Error while getting modifiedDate: \(error?.description)")
+                    return
+                }
                 _nameLabel.text = localizedName as NSString
                 _timestampLabel.text = _timestampFormatter.stringFromDate(modifiedDate as NSDate)
             }
