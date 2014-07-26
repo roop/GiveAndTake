@@ -57,6 +57,7 @@ extension DocumentsManager: iCloudManagerDelegate {
 extension DocumentsManager {
     func createDocument(#name: NSString) -> TextDocument {
         var fileName = name.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
+                           .stringByAppendingPathExtension("txt")
         var url = NSURL(string: fileName, relativeToURL: _documentsRootURL)
         return TextDocument(fileURL: url)
     }
