@@ -9,9 +9,11 @@
 import UIKit
 
 class DocumentsManager: NSObject {
+    weak var documentsListDisplayDelegate: DocumentsListDisplayDelegate?
+
     var _iCloudManager: ICloudManager!
     var _documentsRootURL: NSURL!
-    var _localDocuments: [NSURL] = []
+    var _localDocumentURLs: [NSURL] = []
 
     init() {
         super.init()
@@ -24,6 +26,14 @@ class DocumentsManager: NSObject {
                 inDomains: NSSearchPathDomainMask.UserDomainMask)[0] as? NSURL
         }
         self.startListingDocuments()
+    }
+
+    func localDocumentURLCount() -> Int {
+        return _localDocumentURLs.count
+    }
+
+    func localDocumentURLatIndex(i: Int) -> NSURL {
+        return _localDocumentURLs[i]
     }
 }
 
@@ -73,24 +83,7 @@ extension DocumentsManager {
                 return true
                 } )
         if (error == nil) {
-            _localDocuments = documents as [NSURL]
+            _localDocumentURLs = documents as [NSURL]
         }
-    }
-}
-
-extension DocumentsManager: UICollectionViewDataSource {
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView!) -> Int {
-        return 1
-    }
-    func collectionView(collectionView: UICollectionView!, numberOfItemsInSection _: Int) -> Int {
-        return _localDocuments.count
-    }
-    func collectionView(collectionView: UICollectionView!,
-            cellForItemAtIndexPath indexPath: NSIndexPath!) -> UICollectionViewCell! {
-        var cell = collectionView.dequeueReusableCellWithReuseIdentifier("DocCollectionCell",
-            forIndexPath: indexPath) as DocCollectionViewCell
-        assert(indexPath.section == 0)
-        cell.docURL = _localDocuments[indexPath.item]
-        return cell
     }
 }

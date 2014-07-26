@@ -10,6 +10,7 @@ import UIKit
 
 class DocCollectionViewController: UIViewController {
     weak var _documentsManager: DocumentsManager!
+    var _dataSource: DocCollectionViewDataSource!
 
     init(documentsManager: DocumentsManager) {
         super.init(nibName: nil, bundle: nil)
@@ -28,8 +29,33 @@ class DocCollectionViewController: UIViewController {
         var view = UICollectionView(frame: CGRect(), collectionViewLayout: flowLayout)
         view.backgroundColor = UIColor.grayColor()
         view.registerClass(DocCollectionViewCell.self, forCellWithReuseIdentifier: "DocCollectionCell")
-        view.dataSource = _documentsManager
+        _dataSource = DocCollectionViewDataSource(documentsManager: _documentsManager)
+        view.dataSource = _dataSource
         self.view = view
+    }
+}
+
+class DocCollectionViewDataSource: NSObject, UICollectionViewDataSource {
+    weak var _documentsManager: DocumentsManager!
+
+    init(documentsManager: DocumentsManager) {
+        super.init()
+        _documentsManager = documentsManager
+    }
+
+    func numberOfSectionsInCollectionView(collectionView: UICollectionView!) -> Int {
+        return 1
+    }
+    func collectionView(collectionView: UICollectionView!, numberOfItemsInSection _: Int) -> Int {
+        return _documentsManager.localDocumentURLCount()
+    }
+    func collectionView(collectionView: UICollectionView!,
+        cellForItemAtIndexPath indexPath: NSIndexPath!) -> UICollectionViewCell! {
+        var cell = collectionView.dequeueReusableCellWithReuseIdentifier("DocCollectionCell",
+            forIndexPath: indexPath) as DocCollectionViewCell
+        assert(indexPath.section == 0)
+        cell.docURL = _documentsManager.localDocumentURLatIndex(indexPath.item)
+        return cell
     }
 }
 
