@@ -11,13 +11,37 @@ import UIKit
 class TextEditorViewController: UIViewController {
 
     weak var _documentsManager: DocumentsManager!
-    var _document: TextDocument?
+    var _document: TextDocument? {
+        didSet {
+            if (self._view != nil) {
+                if let document = self._document {
+                    if (!(self._view!.text as NSString).isEqualToString(document.textContents)) {
+                        self._view!.text = document.textContents
+                    }
+                } else {
+                    self._view!.text = ""
+                }
+            }
+        }
+    }
+
     var _title: NSMutableString = ""
     var _view: UITextView?
 
-    init(documentsManager: DocumentsManager) {
+    init(documentsManager: DocumentsManager, documentURL: NSURL? = nil) {
         super.init(nibName: nil, bundle: nil)
         _documentsManager = documentsManager
+        if (documentURL) {
+            var document = TextDocument(fileURL: documentURL)
+            document.openWithCompletionHandler( { (success: Bool) in
+                if (success) {
+                    self._document = document
+                    var title = document.localizedName
+                    self._title = title.mutableCopy() as NSMutableString
+                    self.navigationItem.title = title
+                }
+                })
+        }
     }
 
     override func loadView() {
@@ -26,6 +50,11 @@ class TextEditorViewController: UIViewController {
                     let v = UITextView()
                     v.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
                     v.delegate = self
+                    if (self._document) {
+                        v.text = self._document!.textContents
+                    } else {
+                        v.text = ""
+                    }
                     return v
                 }()
         self.view = _view! as UIView

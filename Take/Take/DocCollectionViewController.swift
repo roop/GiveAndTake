@@ -32,6 +32,7 @@ class DocCollectionViewController: UIViewController {
         view.registerClass(DocCollectionViewCell.self, forCellWithReuseIdentifier: "DocCollectionCell")
         _dataSource = DocCollectionViewDataSource(documentsManager: _documentsManager)
         view.dataSource = _dataSource
+        view.delegate = self
         self.view = view
     }
 }
@@ -43,6 +44,15 @@ extension DocCollectionViewController: DocumentsListDisplayDelegate {
             indexPaths.append(NSIndexPath(forItem: position + i, inSection: 0))
         }
         (self.view as UICollectionView).insertItemsAtIndexPaths(indexPaths)
+    }
+}
+
+extension DocCollectionViewController: UICollectionViewDelegate {
+    func collectionView(collectionView: UICollectionView!, didSelectItemAtIndexPath indexPath: NSIndexPath!) {
+        var documentURL = _documentsManager.localDocumentURLatIndex(indexPath.item)
+        var textEditorVC = TextEditorViewController(documentsManager: _documentsManager,
+            documentURL: documentURL)
+        self.navigationController.pushViewController(textEditorVC, animated: true)
     }
 }
 
