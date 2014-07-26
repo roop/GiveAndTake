@@ -15,6 +15,7 @@ class DocCollectionViewController: UIViewController {
     init(documentsManager: DocumentsManager) {
         super.init(nibName: nil, bundle: nil)
         _documentsManager = documentsManager
+        _documentsManager.documentsListDisplayDelegate = self
     }
 
     override func loadView() {
@@ -32,6 +33,16 @@ class DocCollectionViewController: UIViewController {
         _dataSource = DocCollectionViewDataSource(documentsManager: _documentsManager)
         view.dataSource = _dataSource
         self.view = view
+    }
+}
+
+extension DocCollectionViewController: DocumentsListDisplayDelegate {
+    func localDocumentsAdded(#position: Int, count: Int) {
+        var indexPaths: [NSIndexPath] = []
+        for i in (0 ..< count) {
+            indexPaths.append(NSIndexPath(forItem: position + i, inSection: 0))
+        }
+        (self.view as UICollectionView).insertItemsAtIndexPaths(indexPaths)
     }
 }
 

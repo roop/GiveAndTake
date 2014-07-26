@@ -25,7 +25,9 @@ class DocumentsManager: NSObject {
                 NSSearchPathDirectory.DocumentDirectory,
                 inDomains: NSSearchPathDomainMask.UserDomainMask)[0] as? NSURL
         }
-        self.startListingDocuments()
+        dispatch_async(dispatch_get_main_queue()) {
+            self.startListingDocuments()
+        }
     }
 
     func localDocumentURLCount() -> Int {
@@ -84,6 +86,13 @@ extension DocumentsManager {
                 } )
         if (error == nil) {
             _localDocumentURLs = documents as [NSURL]
+            if (documents.count > 0) {
+                self.documentsListDisplayDelegate?.localDocumentsAdded(position: 0, count: documents.count)
+            }
         }
     }
+}
+
+@objc protocol DocumentsListDisplayDelegate {
+    func localDocumentsAdded(#position: Int, count: Int)
 }
