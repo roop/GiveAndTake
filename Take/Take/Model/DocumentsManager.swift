@@ -55,11 +55,26 @@ extension DocumentsManager: iCloudManagerDelegate {
 }
 
 extension DocumentsManager {
-    func createDocument(#name: NSString) -> TextDocument {
+    func createDocument(#name: NSString, textContents: NSString,
+        completionHandler: ((TextDocument?) -> Void)?) {
         var fileName = name.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
                            .stringByAppendingPathExtension("txt")
         var url = NSURL(string: fileName, relativeToURL: _documentsRootURL)
-        return TextDocument(fileURL: url)
+        var document = TextDocument(fileURL: url)
+        document.textContents = textContents.mutableCopy() as NSMutableString
+        document.saveToURL(document.fileURL, forSaveOperation: .ForCreating,
+            completionHandler: { [weak self] (fileCreated: Bool) in
+                if (fileCreated) {
+                    if let strongSelf = self {
+                        strongSelf._localDocumentURLs.insert(url, atIndex: 0)
+                        strongSelf.documentsListDisplayDelegate?.localDocumentsAdded(
+                            position: 0, count: 1)
+                    }
+                    completionHandler?(document)
+                } else {
+                    completionHandler?(nil)
+                }
+            })
     }
 
     func startListingDocuments() {

@@ -63,13 +63,14 @@ extension TextEditorViewController: UITextViewDelegate {
             // Once the user types past the first line,
             // create the document
             if (isDocumentTitleFinalized) {
-                var document = _documentsManager.createDocument(name: _title)
-                document.textContents = (textView.text as NSString).mutableCopy() as NSMutableString
-                document.textContents.replaceCharactersInRange(range, withString: text)
-                document.saveToURL(document.fileURL, forSaveOperation: .ForCreating,
-                    completionHandler: { (fileCreated: Bool) in
-                        if (fileCreated && self != nil && self._document == nil) {
+                var textContents = (textView.text as NSString).stringByReplacingCharactersInRange(
+                    range, withString: text)
+                _documentsManager.createDocument(name: _title,
+                    textContents: textContents,
+                    completionHandler: { (document: TextDocument?) in
+                        if (document != nil && self != nil && self._document == nil) {
                             self._document = document
+                            println("Created")
                         }
                     })
             }
@@ -81,9 +82,12 @@ extension TextEditorViewController: UITextViewDelegate {
 extension TextEditorViewController {
     override func viewWillDisappear(animated: Bool) {
         if (self._document == nil) {
-            var document = _documentsManager.createDocument(name: _title)
-            document.textContents = ""
-            self._document = document
+            if (_title.length > 0) {
+                _documentsManager.createDocument(name: _title,
+                    textContents: _title,
+                    completionHandler: nil)
+            }
+            return
         }
         self._document!.closeWithCompletionHandler({ success in
             if (success) {
