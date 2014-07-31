@@ -46,6 +46,7 @@ class DocumentsManager: NSObject {
         _localRootURL = NSFileManager.defaultManager().URLsForDirectory(
             NSSearchPathDirectory.DocumentDirectory,
             inDomains: NSSearchPathDomainMask.UserDomainMask)[0] as NSURL
+
         super.init()
 
         _isListingLocalDocuments = true
@@ -56,9 +57,11 @@ class DocumentsManager: NSObject {
                         strongSelf._localDocumentsList = documents
                     }
                     strongSelf._isListingLocalDocuments = false
-                    if (documents?.count && !strongSelf._isUsingUbiquitousContainer) {
-                        strongSelf.documentsListDisplayDelegate?.documentsAdded?(position: 0,
-                            count: documents!.count)
+                    if (!strongSelf.isiCloudUsageEnabled || !strongSelf._iCloudManager.isLoggedIntoiCloud) {
+                        if (documents?.count) {
+                            strongSelf.documentsListDisplayDelegate?.documentsAdded?(position: 0,
+                                count: documents!.count)
+                        }
                     }
                 }
             })
@@ -69,7 +72,21 @@ class DocumentsManager: NSObject {
         if (_iCloudManager.isiCloudAvailable) {
             gotAccessToUbiquityContainer()
         }
+
     }
+
+    func documentURLCount() -> Int {
+        return (self.isUsingUbiquitousContainer ?
+                    self.ubiquitousDocumentURLCount() :
+                    self.localDocumentURLCount() )
+    }
+
+    func documentURLatIndex(i: Int) -> NSURL {
+        return (self.isUsingUbiquitousContainer ?
+                    self.ubiquitousDocumentURLatIndex(i) :
+                    self.localDocumentURLatIndex(i) )
+    }
+
 }
 
 // Local documents
@@ -115,6 +132,18 @@ extension DocumentsManager {
 
 extension DocumentsManager {
 
+    func ubiquitousDocumentURLCount() -> Int {
+        if (!_ubiquitousDocumentsQuery.started || _ubiquitousDocumentsQuery.gathering) {
+            return 0
+        }
+        return _ubiquitousDocumentsQuery.resultCount
+    }
+
+    func ubiquitousDocumentURLatIndex(i: Int) -> NSURL {
+        var mdItem: NSMetadataItem = _ubiquitousDocumentsQuery.resultAtIndex(i) as NSMetadataItem
+        return mdItem.valueForAttribute(NSMetadataItemURLKey) as NSURL
+    }
+
     func startUsingiCloud() {
 
         assert(_iCloudManager.isLoggedIntoiCloud)
@@ -122,11 +151,43 @@ extension DocumentsManager {
 
         // Find the root URL
 
-        _ubiquitousRootURL = NSURL(string: "Documents", relativeToURL: _iCloudManager.ubiquityContainerURL)
+        _ubiquitousRootURL = _iCloudManager.ubiquityContainerURL!.URLByAppendingPathComponent(
+            "Documents",
+            isDirectory: true)
 
-        self._isUsingUbiquitousContainer = true
+        // Start a query
+
+        var query = _ubiquitousDocumentsQuery
+        if (!query.started) {
+            query.searchScopes = [ NSMetadataQueryUbiquitousDocumentsScope ]
+            query.predicate = NSPredicate(format: "%K LIKE '*'", argumentArray: [ NSMetadataItemFSNameKey ])
+            NSNotificationCenter.defaultCenter().addObserver(self,
+                selector: "ubiquitousDocumentsInitialListReceived:",
+                name: NSMetadataQueryDidFinishGatheringNotification, object: nil)
+            // Start the query in the next run loop, in order to ensure that
+            // documentsListReset() is called before the query gets any results.
+            dispatch_async(dispatch_get_main_queue()) {
+                var ok = self._ubiquitousDocumentsQuery.startQuery()
+                if (!ok) {
+                    println("Error starting NSMetaDataQuery")
+                } else {
+                    println("Started NSMetaDataQuery")
+                }
+            }
+        }
+
+        // Switch to the iCloud container
+
+        self._isUsingUbiquitousContainer = true // Will cause documentsListReset() to be called
+
     }
 
+    func ubiquitousDocumentsInitialListReceived(_: NSNotification) {
+        if (_ubiquitousDocumentsQuery.resultCount > 0 && isUsingUbiquitousContainer) {
+            self.documentsListDisplayDelegate?.documentsAdded?(position: 0,
+                count: _ubiquitousDocumentsQuery.resultCount)
+        }
+    }
 }
 
 extension DocumentsManager: iCloudManagerDelegate {

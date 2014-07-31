@@ -45,11 +45,15 @@ extension DocCollectionViewController: DocumentsListDisplayDelegate {
         }
         (self.view as UICollectionView).insertItemsAtIndexPaths(indexPaths)
     }
+
+    func documentsListReset() {
+        (self.view as UICollectionView).reloadData()
+    }
 }
 
 extension DocCollectionViewController: UICollectionViewDelegate {
     func collectionView(collectionView: UICollectionView!, didSelectItemAtIndexPath indexPath: NSIndexPath!) {
-        var documentURL = _documentsManager.localDocumentURLatIndex(indexPath.item)
+        var documentURL = _documentsManager.documentURLatIndex(indexPath.item)
         var textEditorVC = TextEditorViewController(documentsManager: _documentsManager,
             documentURL: documentURL)
         self.navigationController.pushViewController(textEditorVC, animated: true)
@@ -68,14 +72,14 @@ class DocCollectionViewDataSource: NSObject, UICollectionViewDataSource {
         return 1
     }
     func collectionView(collectionView: UICollectionView!, numberOfItemsInSection _: Int) -> Int {
-        return _documentsManager.localDocumentURLCount()
+        return _documentsManager.documentURLCount()
     }
     func collectionView(collectionView: UICollectionView!,
         cellForItemAtIndexPath indexPath: NSIndexPath!) -> UICollectionViewCell! {
         var cell = collectionView.dequeueReusableCellWithReuseIdentifier("DocCollectionCell",
             forIndexPath: indexPath) as DocCollectionViewCell
         assert(indexPath.section == 0)
-        cell.docURL = _documentsManager.localDocumentURLatIndex(indexPath.item)
+        cell.docURL = _documentsManager.documentURLatIndex(indexPath.item)
         return cell
     }
 }

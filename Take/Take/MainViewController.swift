@@ -13,7 +13,7 @@ class MainViewController: UIViewController {
 
     init() {
         super.init(nibName: nil, bundle: nil)
-        _documentsManager = DocumentsManager(isiCloudUsageEnabled: false)
+        _documentsManager = DocumentsManager(isiCloudUsageEnabled: true)
 
         self.navigationItem.title = "Take"
         self.navigationItem.rightBarButtonItems = [
