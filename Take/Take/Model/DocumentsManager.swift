@@ -9,34 +9,124 @@
 import UIKit
 
 class DocumentsManager: NSObject {
+
     weak var documentsListDisplayDelegate: DocumentsListDisplayDelegate?
 
-    var _iCloudManager: ICloudManager!
-    var _documentsRootURL: NSURL!
-    var _localDocumentURLs: [NSURL] = []
+    var isiCloudAvailable: Bool {
+        return _iCloudManager.isiCloudAvailable
+    }
+    var isiCloudUsageEnabled: Bool {
+        didSet { /* TODO */ }
+    }
+    var isUsingUbiquitousContainer: Bool {
+        return _isUsingUbiquitousContainer
+    }
 
-    init() {
-        super.init()
-        _iCloudManager = ICloudManager(delegate: self)
-        if (_iCloudManager.isLoggedIntoiCloud && _iCloudManager.ubiquityContainerURL) {
-            _documentsRootURL = NSURL(string: "Documents", relativeToURL: _iCloudManager.ubiquityContainerURL)
-        } else {
-            _documentsRootURL = NSFileManager.defaultManager().URLsForDirectory(
-                NSSearchPathDirectory.DocumentDirectory,
-                inDomains: NSSearchPathDomainMask.UserDomainMask)[0] as? NSURL
-        }
-        dispatch_async(dispatch_get_main_queue()) {
-            self.startListingDocuments()
+    // Private variables
+
+    var _iCloudManager: ICloudManager!
+    var _localRootURL: NSURL
+    var _ubiquitousRootURL: NSURL?
+    var _localDocumentsList: [NSURL] = []
+    var _ubiquitousDocumentsQuery = NSMetadataQuery()
+    var _isListingLocalDocuments = false
+    var _isUsingUbiquitousContainer: Bool = false {
+        didSet {
+            if (_isUsingUbiquitousContainer != oldValue) {
+                self.documentsListDisplayDelegate?.documentsListReset?()
+            }
         }
     }
 
+    init(isiCloudUsageEnabled: Bool) {
+        self.isiCloudUsageEnabled = isiCloudUsageEnabled
+
+        // Init local documents
+
+        _localRootURL = NSFileManager.defaultManager().URLsForDirectory(
+            NSSearchPathDirectory.DocumentDirectory,
+            inDomains: NSSearchPathDomainMask.UserDomainMask)[0] as NSURL
+        super.init()
+
+        _isListingLocalDocuments = true
+        listLocalDocumentsInBackgroundQueue(completion: { [weak self] documents in
+                if let strongSelf = self {
+                    assert(strongSelf._localDocumentsList.count == 0)
+                    if let documents = documents {
+                        strongSelf._localDocumentsList = documents
+                    }
+                    strongSelf._isListingLocalDocuments = false
+                    if (documents?.count && !strongSelf._isUsingUbiquitousContainer) {
+                        strongSelf.documentsListDisplayDelegate?.documentsAdded?(position: 0,
+                            count: documents!.count)
+                    }
+                }
+            })
+
+        // Init iCloud documents
+
+        _iCloudManager = ICloudManager(delegate: self)
+        if (_iCloudManager.isiCloudAvailable) {
+            gotAccessToUbiquityContainer()
+        }
+    }
+}
+
+// Local documents
+
+extension DocumentsManager {
+
     func localDocumentURLCount() -> Int {
-        return _localDocumentURLs.count
+        return _localDocumentsList.count
     }
 
     func localDocumentURLatIndex(i: Int) -> NSURL {
-        return _localDocumentURLs[i]
+        return _localDocumentsList[i]
     }
+
+    func listLocalDocumentsInBackgroundQueue(#completion: (documents: [NSURL]?) -> ()) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { [weak self] in
+            if let strongSelf = self {
+                var error: NSError?
+                let documents = NSFileManager.defaultManager().contentsOfDirectoryAtURL(strongSelf._localRootURL,
+                    includingPropertiesForKeys: [ NSURLLocalizedNameKey, NSURLAttributeModificationDateKey ],
+                    options: nil, error: &error).sorted( { (url1, url2) -> Bool in
+                        // Sort so we get most recently modified first
+                        var error1: NSError?, error2: NSError?
+                        var modifiedDate1: AnyObject?, modifiedDate2: AnyObject?
+                        url1.getResourceValue(&modifiedDate1, forKey: NSURLAttributeModificationDateKey, error: &error1)
+                        url2.getResourceValue(&modifiedDate2, forKey: NSURLAttributeModificationDateKey, error: &error2)
+                        if (error1 == nil && error2 == nil) {
+                            var comparisonResult: NSComparisonResult = (modifiedDate1 as NSDate)
+                                .compare(modifiedDate2 as NSDate)
+                            return (comparisonResult == .OrderedDescending)
+                        }
+                        return true
+                        } )
+                dispatch_async(dispatch_get_main_queue()) {
+                    completion(documents: (error == nil) ? (documents as [NSURL]) : (nil))
+                }
+            }
+        }
+    }
+}
+
+// iCloud documents
+
+extension DocumentsManager {
+
+    func startUsingiCloud() {
+
+        assert(_iCloudManager.isLoggedIntoiCloud)
+        assert(_iCloudManager.ubiquityContainerURL)
+
+        // Find the root URL
+
+        _ubiquitousRootURL = NSURL(string: "Documents", relativeToURL: _iCloudManager.ubiquityContainerURL)
+
+        self._isUsingUbiquitousContainer = true
+    }
+
 }
 
 extension DocumentsManager: iCloudManagerDelegate {
@@ -44,7 +134,9 @@ extension DocumentsManager: iCloudManagerDelegate {
     func gotAccessToUbiquityContainer() {
         assert(_iCloudManager.isLoggedIntoiCloud)
         assert(_iCloudManager.ubiquityContainerURL)
-        _documentsRootURL = NSURL(string: "Documents", relativeToURL: _iCloudManager.ubiquityContainerURL)
+        if (self.isiCloudUsageEnabled) {
+            startUsingiCloud()
+        }
     }
 
     // TODO
@@ -54,21 +146,29 @@ extension DocumentsManager: iCloudManagerDelegate {
 
 }
 
+// Creating a document
+
 extension DocumentsManager {
     func createDocument(#name: NSString, textContents: NSString,
         completionHandler: ((TextDocument?) -> Void)?) {
+        var isUsingUbiquitousContainer = self.isUsingUbiquitousContainer
+        var rootURL: NSURL = (isUsingUbiquitousContainer ? _ubiquitousRootURL! : _localRootURL)
         var fileName = name.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
                            .stringByAppendingPathExtension("txt")
-        var url = NSURL(string: fileName, relativeToURL: _documentsRootURL)
+        var url = NSURL(string: fileName, relativeToURL: rootURL)
         var document = TextDocument(fileURL: url)
         document.textContents = textContents.mutableCopy() as NSMutableString
         document.saveToURL(document.fileURL, forSaveOperation: .ForCreating,
             completionHandler: { [weak self] (fileCreated: Bool) in
                 if (fileCreated) {
                     if let strongSelf = self {
-                        strongSelf._localDocumentURLs.insert(url, atIndex: 0)
-                        strongSelf.documentsListDisplayDelegate?.localDocumentsAdded(
-                            position: 0, count: 1)
+                        if (isUsingUbiquitousContainer) {
+                            // Nothing to do. The NSMetaDataQuery will update automatically.
+                        } else {
+                            strongSelf._localDocumentsList.insert(url, atIndex: 0)
+                            strongSelf.documentsListDisplayDelegate?.documentsAdded?(
+                                position: 0, count: 1)
+                        }
                     }
                     completionHandler?(document)
                 } else {
@@ -76,39 +176,9 @@ extension DocumentsManager {
                 }
             })
     }
-
-    func startListingDocuments() {
-        // ls iCloud directory
-        if (_iCloudManager.isLoggedIntoiCloud) {
-            // TODO
-        }
-
-        // ls local directory
-        var error: NSError?
-        let documents = NSFileManager.defaultManager().contentsOfDirectoryAtURL(_documentsRootURL,
-            includingPropertiesForKeys: [ NSURLLocalizedNameKey, NSURLAttributeModificationDateKey ],
-            options: nil, error: &error).sorted( { (url1, url2) -> Bool in
-                // Sort so we get most recently modified first
-                var error1: NSError?, error2: NSError?
-                var modifiedDate1: AnyObject?, modifiedDate2: AnyObject?
-                url1.getResourceValue(&modifiedDate1, forKey: NSURLAttributeModificationDateKey, error: &error1)
-                url2.getResourceValue(&modifiedDate2, forKey: NSURLAttributeModificationDateKey, error: &error2)
-                if (error1 == nil && error2 == nil) {
-                    var comparisonResult: NSComparisonResult = (modifiedDate1 as NSDate)
-                        .compare(modifiedDate2 as NSDate)
-                    return (comparisonResult == .OrderedDescending)
-                }
-                return true
-                } )
-        if (error == nil) {
-            _localDocumentURLs = documents as [NSURL]
-            if (documents.count > 0) {
-                self.documentsListDisplayDelegate?.localDocumentsAdded(position: 0, count: documents.count)
-            }
-        }
-    }
 }
 
 @objc protocol DocumentsListDisplayDelegate {
-    func localDocumentsAdded(#position: Int, count: Int)
+    optional func documentsAdded(#position: Int, count: Int)
+    optional func documentsListReset()
 }

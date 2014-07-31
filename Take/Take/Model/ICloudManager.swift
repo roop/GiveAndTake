@@ -64,6 +64,10 @@ class ICloudManager {
         return _ubiquityContainerURL
     }
 
+    var isiCloudAvailable: Bool {
+        return (isLoggedIntoiCloud && _ubiquityContainerURL != nil)
+    }
+
     // Init and Deinit
 
     init(delegate: iCloudManagerDelegate) {

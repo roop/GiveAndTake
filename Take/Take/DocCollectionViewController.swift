@@ -38,7 +38,7 @@ class DocCollectionViewController: UIViewController {
 }
 
 extension DocCollectionViewController: DocumentsListDisplayDelegate {
-    func localDocumentsAdded(#position: Int, count: Int) {
+    func documentsAdded(#position: Int, count: Int) {
         var indexPaths: [NSIndexPath] = []
         for i in (0 ..< count) {
             indexPaths.append(NSIndexPath(forItem: position + i, inSection: 0))
