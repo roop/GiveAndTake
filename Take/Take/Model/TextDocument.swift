@@ -11,6 +11,7 @@ import MobileCoreServices
 
 class TextDocument: UIDocument {
     var textContents: NSMutableString = ""
+    weak var editorDelegate: TextDocumentEditorDelegate?
 
     override func loadFromContents(contents: AnyObject!, ofType typeName: String!, error outError: AutoreleasingUnsafePointer<NSError?>) -> Bool {
         if UTTypeConformsTo(typeName as NSString, kUTTypePlainText) > 0 {
@@ -35,4 +36,17 @@ class TextDocument: UIDocument {
     override func savingFileType() -> String! {
         return kUTTypePlainText as NSString
     }
+
+    override func disableEditing() {
+        self.editorDelegate?.disableEditing?()
+    }
+
+    override func enableEditing() {
+        self.editorDelegate?.enableEditing?()
+    }
+}
+
+@objc protocol TextDocumentEditorDelegate {
+    optional func disableEditing()
+    optional func enableEditing()
 }

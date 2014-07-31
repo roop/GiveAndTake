@@ -36,6 +36,7 @@ class TextEditorViewController: UIViewController {
             document.openWithCompletionHandler( { (success: Bool) in
                 if (success) {
                     self._document = document
+                    document.editorDelegate = self
                     var title = document.localizedName
                     self._title = title.mutableCopy() as NSMutableString
                     self.navigationItem.title = title
@@ -105,6 +106,19 @@ extension TextEditorViewController: UITextViewDelegate {
             }
 
             return true
+    }
+}
+
+extension TextEditorViewController: TextDocumentEditorDelegate {
+    func disableEditing() {
+        if let view = _view {
+            view.editable = false
+        }
+    }
+    func enableEditing() {
+        if let view = _view {
+            view.editable = true
+        }
     }
 }
 
