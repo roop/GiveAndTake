@@ -16,6 +16,7 @@
 		6F0BCB1319751AEF0016852A /* TakeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0BCB1219751AEF0016852A /* TakeTests.swift */; };
 		6F0BCB1D19751B380016852A /* AutoLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0BCB1C19751B380016852A /* AutoLayoutHelper.swift */; };
 		6F0BCB1F19751B760016852A /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0BCB1E19751B760016852A /* MainViewController.swift */; };
+		6F3D6DD3198CBBA4008CBD37 /* ObservationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3D6DD2198CBBA4008CBD37 /* ObservationHelper.swift */; };
 		6F482D121977ABBA00A0C0FA /* Defines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F482D111977ABBA00A0C0FA /* Defines.swift */; };
 		6FBD74B5197A85D000667622 /* TextDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FBD74B4197A85D000667622 /* TextDocument.swift */; };
 /* End PBXBuildFile section */
@@ -44,6 +45,7 @@
 		6F0BCB1219751AEF0016852A /* TakeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TakeTests.swift; sourceTree = "<group>"; };
 		6F0BCB1C19751B380016852A /* AutoLayoutHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoLayoutHelper.swift; sourceTree = "<group>"; };
 		6F0BCB1E19751B760016852A /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		6F3D6DD2198CBBA4008CBD37 /* ObservationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObservationHelper.swift; sourceTree = "<group>"; };
 		6F482D111977ABBA00A0C0FA /* Defines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Defines.swift; sourceTree = "<group>"; };
 		6FBD74B4197A85D000667622 /* TextDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TextDocument.swift; path = Model/TextDocument.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -106,6 +108,7 @@
 				6F0BCB1E19751B760016852A /* MainViewController.swift */,
 				6F0B3E42197925FE006DB765 /* TextEditorViewController.swift */,
 				6F0674CF1981561500C5EED0 /* DocCollectionViewController.swift */,
+				6F3D6DD2198CBBA4008CBD37 /* ObservationHelper.swift */,
 			);
 			path = Take;
 			sourceTree = "<group>";
@@ -236,6 +239,7 @@
 				6FBD74B5197A85D000667622 /* TextDocument.swift in Sources */,
 				6F0BCB1D19751B380016852A /* AutoLayoutHelper.swift in Sources */,
 				6F0B3E43197925FE006DB765 /* TextEditorViewController.swift in Sources */,
+				6F3D6DD3198CBBA4008CBD37 /* ObservationHelper.swift in Sources */,
 				6F0B3E3F1978FA59006DB765 /* DocumentsManager.swift in Sources */,
 				6F0BCB0519751AEF0016852A /* AppDelegate.swift in Sources */,
 				6F482D121977ABBA00A0C0FA /* Defines.swift in Sources */,
