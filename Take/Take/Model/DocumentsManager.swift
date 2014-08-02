@@ -38,6 +38,8 @@ class DocumentsManager: NSObject {
         }
     }
 
+    var _queryInitialListDoneObserver: AnyObject?
+
     init(isiCloudUsageEnabled: Bool) {
         self.isiCloudUsageEnabled = isiCloudUsageEnabled
 
@@ -161,9 +163,14 @@ extension DocumentsManager {
         if (!query.started) {
             query.searchScopes = [ NSMetadataQueryUbiquitousDocumentsScope ]
             query.predicate = NSPredicate(format: "%K LIKE '*'", argumentArray: [ NSMetadataItemFSNameKey ])
-            NSNotificationCenter.defaultCenter().addObserver(self,
-                selector: "ubiquitousDocumentsInitialListReceived:",
-                name: NSMetadataQueryDidFinishGatheringNotification, object: nil)
+
+            _queryInitialListDoneObserver = query.onNotification(NSMetadataQueryDidFinishGatheringNotification) {
+                [weak self] _ in
+                if let strongSelf = self {
+                    strongSelf.ubiquitousDocumentsInitialListReceived()
+                }
+            }
+
             // Start the query in the next run loop, in order to ensure that
             // documentsListReset() is called before the query gets any results.
             dispatch_async(dispatch_get_main_queue()) {
@@ -182,7 +189,7 @@ extension DocumentsManager {
 
     }
 
-    func ubiquitousDocumentsInitialListReceived(_: NSNotification) {
+    func ubiquitousDocumentsInitialListReceived() {
         if (_ubiquitousDocumentsQuery.resultCount > 0 && isUsingUbiquitousContainer) {
             self.documentsListDisplayDelegate?.documentsAdded?(position: 0,
                 count: _ubiquitousDocumentsQuery.resultCount)
