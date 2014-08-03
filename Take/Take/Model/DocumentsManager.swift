@@ -38,7 +38,7 @@ class DocumentsManager: NSObject {
         }
     }
 
-    var _queryInitialListDoneObserver: AnyObject?
+    var _observers: [AnyObject] = []
 
     init(isiCloudUsageEnabled: Bool) {
         self.isiCloudUsageEnabled = isiCloudUsageEnabled
@@ -61,8 +61,9 @@ class DocumentsManager: NSObject {
                     strongSelf._isListingLocalDocuments = false
                     if (!strongSelf.isiCloudUsageEnabled || !strongSelf._iCloudManager.isLoggedIntoiCloud) {
                         if (documents?.count) {
-                            strongSelf.documentsListDisplayDelegate?.documentsAdded?(position: 0,
-                                count: documents!.count)
+                            var range = NSRange(location: 0, length: documents!.count)
+                            strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(
+                                NSIndexSet(indexesInRange: range))
                         }
                     }
                 }
@@ -78,9 +79,10 @@ class DocumentsManager: NSObject {
     }
 
     func documentURLCount() -> Int {
-        return (self.isUsingUbiquitousContainer ?
+        var i = (self.isUsingUbiquitousContainer ?
                     self.ubiquitousDocumentURLCount() :
                     self.localDocumentURLCount() )
+        return i
     }
 
     func documentURLatIndex(i: Int) -> NSURL {
@@ -135,9 +137,6 @@ extension DocumentsManager {
 extension DocumentsManager {
 
     func ubiquitousDocumentURLCount() -> Int {
-        if (!_ubiquitousDocumentsQuery.started || _ubiquitousDocumentsQuery.gathering) {
-            return 0
-        }
         return _ubiquitousDocumentsQuery.resultCount
     }
 
@@ -164,15 +163,27 @@ extension DocumentsManager {
             query.searchScopes = [ NSMetadataQueryUbiquitousDocumentsScope ]
             query.predicate = NSPredicate(format: "%K LIKE '*'", argumentArray: [ NSMetadataItemFSNameKey ])
 
-            _queryInitialListDoneObserver = query.onNotification(NSMetadataQueryDidFinishGatheringNotification) {
-                [weak self] _ in
+            _observers += query.onChange("results") {
+                [weak self] change in
                 if let strongSelf = self {
-                    strongSelf.ubiquitousDocumentsInitialListReceived()
+                    if let indexes: AnyObject = change[NSKeyValueChangeIndexesKey] {
+                        var indexes = change[NSKeyValueChangeIndexesKey] as NSMutableIndexSet
+                        switch (change[ NSKeyValueChangeKindKey ] as NSNumber) {
+                        case NSKeyValueChange.Insertion.toRaw():
+                            strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(indexes)
+                        case NSKeyValueChange.Removal.toRaw():
+                            strongSelf.documentsListDisplayDelegate?.documentsRemovedAtIndexes?(indexes)
+                        case NSKeyValueChange.Replacement.toRaw():
+                            strongSelf.documentsListDisplayDelegate?.documentsChangedAtIndexes?(indexes)
+                        default:
+                            break // Nothing to do
+                        }
+                    }
                 }
-            }
+            } // End of query.onChange()
 
             // Start the query in the next run loop, in order to ensure that
-            // documentsListReset() is called before the query gets any results.
+            // documentsListReset() is called before any query results KVO fires.
             dispatch_async(dispatch_get_main_queue()) {
                 var ok = self._ubiquitousDocumentsQuery.startQuery()
                 if (!ok) {
@@ -187,13 +198,6 @@ extension DocumentsManager {
 
         self._isUsingUbiquitousContainer = true // Will cause documentsListReset() to be called
 
-    }
-
-    func ubiquitousDocumentsInitialListReceived() {
-        if (_ubiquitousDocumentsQuery.resultCount > 0 && isUsingUbiquitousContainer) {
-            self.documentsListDisplayDelegate?.documentsAdded?(position: 0,
-                count: _ubiquitousDocumentsQuery.resultCount)
-        }
     }
 }
 
@@ -234,8 +238,7 @@ extension DocumentsManager {
                             // Nothing to do. The NSMetaDataQuery will update automatically.
                         } else {
                             strongSelf._localDocumentsList.insert(url, atIndex: 0)
-                            strongSelf.documentsListDisplayDelegate?.documentsAdded?(
-                                position: 0, count: 1)
+                            strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(NSIndexSet(index: 0))
                         }
                     }
                     completionHandler?(document)
@@ -247,6 +250,8 @@ extension DocumentsManager {
 }
 
 @objc protocol DocumentsListDisplayDelegate {
-    optional func documentsAdded(#position: Int, count: Int)
+    optional func documentsAddedAtIndexes(indexes: NSIndexSet)
+    optional func documentsRemovedAtIndexes(indexes: NSIndexSet)
+    optional func documentsChangedAtIndexes(indexes: NSIndexSet)
     optional func documentsListReset()
 }

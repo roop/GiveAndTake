@@ -38,10 +38,10 @@ class DocCollectionViewController: UIViewController {
 }
 
 extension DocCollectionViewController: DocumentsListDisplayDelegate {
-    func documentsAdded(#position: Int, count: Int) {
+    func documentsAddedAtIndexes(indexes: NSIndexSet) {
         var indexPaths: [NSIndexPath] = []
-        for i in (0 ..< count) {
-            indexPaths.append(NSIndexPath(forItem: position + i, inSection: 0))
+        indexes.enumerateIndexesUsingBlock { i, _ in
+            indexPaths.append(NSIndexPath(forItem: i, inSection: 0))
         }
         (self.view as UICollectionView).insertItemsAtIndexPaths(indexPaths)
     }
