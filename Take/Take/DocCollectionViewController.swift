@@ -46,6 +46,14 @@ extension DocCollectionViewController: DocumentsListDisplayDelegate {
         (self.view as UICollectionView).insertItemsAtIndexPaths(indexPaths)
     }
 
+    func documentsChangedAtIndexes(indexes: NSIndexSet) {
+        var indexPaths: [NSIndexPath] = []
+        indexes.enumerateIndexesUsingBlock { i, _ in
+            indexPaths.append(NSIndexPath(forItem: i, inSection: 0))
+        }
+        (self.view as UICollectionView).reloadItemsAtIndexPaths(indexPaths)
+    }
+
     func documentsListReset() {
         (self.view as UICollectionView).reloadData()
     }
@@ -88,13 +96,35 @@ class DocCollectionViewCell: UICollectionViewCell {
     var docURL: NSURL? {
         didSet {
             if let docURL = self.docURL {
+
                 _nameLabel.text = ""
                 _timestampLabel.text = ""
+
                 var localizedName: AnyObject?, modifiedDate: AnyObject?
                 docURL.getResourceValue(&localizedName, forKey: NSURLLocalizedNameKey, error: nil)
                 docURL.getResourceValue(&modifiedDate, forKey: NSURLAttributeModificationDateKey, error: nil)
+
+                var subtitle = ""
+                var isUbiquitous: AnyObject?
+                docURL.getResourceValue(&isUbiquitous, forKey: NSURLIsUbiquitousItemKey, error: nil)
+                if (isUbiquitous) {
+                    var isUploading: AnyObject?, isDownloading: AnyObject?
+                    docURL.getResourceValue(&isUploading, forKey: NSURLUbiquitousItemIsUploadingKey, error: nil)
+                    docURL.getResourceValue(&isDownloading, forKey: NSURLUbiquitousItemIsDownloadingKey, error: nil)
+                    if (isDownloading as NSNumber).boolValue {
+                        subtitle = "Downloading"
+                    } else if (isUploading as NSNumber).boolValue {
+                        subtitle = "Uploading"
+                    } else {
+                        subtitle = _timestampFormatter.stringFromDate(modifiedDate as NSDate)
+                    }
+                } else {
+                    subtitle = _timestampFormatter.stringFromDate(modifiedDate as NSDate)
+                }
+
                 _nameLabel.text = localizedName as NSString
-                _timestampLabel.text = _timestampFormatter.stringFromDate(modifiedDate as NSDate)
+                _timestampLabel.text = subtitle
+
             }
         }
     }
