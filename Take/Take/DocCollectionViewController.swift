@@ -101,16 +101,16 @@ class DocCollectionViewCell: UICollectionViewCell {
                 _timestampLabel.text = ""
 
                 var localizedName: AnyObject?, modifiedDate: AnyObject?
-                docURL.getResourceValue(&localizedName, forKey: NSURLLocalizedNameKey, error: nil)
-                docURL.getResourceValue(&modifiedDate, forKey: NSURLContentModificationDateKey, error: nil)
+                docURL.getPromisedItemResourceValue(&localizedName, forKey: NSURLLocalizedNameKey, error: nil)
+                docURL.getPromisedItemResourceValue(&modifiedDate, forKey: NSURLContentModificationDateKey, error: nil)
 
                 var subtitle = ""
                 var isUbiquitous: AnyObject?
-                docURL.getResourceValue(&isUbiquitous, forKey: NSURLIsUbiquitousItemKey, error: nil)
+                docURL.getPromisedItemResourceValue(&isUbiquitous, forKey: NSURLIsUbiquitousItemKey, error: nil)
                 if (isUbiquitous) {
                     var isUploading: AnyObject?, isDownloading: AnyObject?
-                    docURL.getResourceValue(&isUploading, forKey: NSURLUbiquitousItemIsUploadingKey, error: nil)
-                    docURL.getResourceValue(&isDownloading, forKey: NSURLUbiquitousItemIsDownloadingKey, error: nil)
+                    docURL.getPromisedItemResourceValue(&isUploading, forKey: NSURLUbiquitousItemIsUploadingKey, error: nil)
+                    docURL.getPromisedItemResourceValue(&isDownloading, forKey: NSURLUbiquitousItemIsDownloadingKey, error: nil)
                     if (isDownloading as NSNumber).boolValue {
                         subtitle = "Downloading"
                     } else if (isUploading as NSNumber).boolValue {
