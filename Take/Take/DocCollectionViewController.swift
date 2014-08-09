@@ -102,7 +102,7 @@ class DocCollectionViewCell: UICollectionViewCell {
 
                 var localizedName: AnyObject?, modifiedDate: AnyObject?
                 docURL.getResourceValue(&localizedName, forKey: NSURLLocalizedNameKey, error: nil)
-                docURL.getResourceValue(&modifiedDate, forKey: NSURLAttributeModificationDateKey, error: nil)
+                docURL.getResourceValue(&modifiedDate, forKey: NSURLContentModificationDateKey, error: nil)
 
                 var subtitle = ""
                 var isUbiquitous: AnyObject?
