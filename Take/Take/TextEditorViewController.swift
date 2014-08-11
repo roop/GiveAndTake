@@ -31,7 +31,7 @@ class TextEditorViewController: UIViewController {
     init(documentsManager: DocumentsManager, documentURL: NSURL? = nil) {
         super.init(nibName: nil, bundle: nil)
         _documentsManager = documentsManager
-        if (documentURL) {
+        if (documentURL != nil) {
             var document = TextDocument(fileURL: documentURL)
             document.openWithCompletionHandler( { (success: Bool) in
                 if (success) {
@@ -45,13 +45,18 @@ class TextEditorViewController: UIViewController {
         }
     }
 
+    required init(coder: NSCoder) {
+        // Explicitly disallow initing from an archive
+        fatalError("Object of type TextEditorViewController cannot be initialized with an NSCoder")
+    }
+
     override func loadView() {
         self.navigationItem.title = "Untitled"
         _view = {
                     let v = UITextView()
                     v.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
                     v.delegate = self
-                    if (self._document) {
+                    if (self._document != nil) {
                         v.text = self._document!.textContents
                     } else {
                         v.text = ""

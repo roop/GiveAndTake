@@ -60,7 +60,7 @@ class DocumentsManager: NSObject {
                     }
                     strongSelf._isListingLocalDocuments = false
                     if (!strongSelf.isiCloudUsageEnabled || !strongSelf._iCloudManager.isLoggedIntoiCloud) {
-                        if (documents?.count) {
+                        if (documents != nil && documents!.count > 0) {
                             var range = NSRange(location: 0, length: documents!.count)
                             strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(
                                 NSIndexSet(indexesInRange: range))
@@ -148,7 +148,7 @@ extension DocumentsManager {
     func startUsingiCloud() {
 
         assert(_iCloudManager.isLoggedIntoiCloud)
-        assert(_iCloudManager.ubiquityContainerURL)
+        assert(_iCloudManager.ubiquityContainerURL != nil)
 
         // Find the root URL
 
@@ -163,7 +163,7 @@ extension DocumentsManager {
             query.searchScopes = [ NSMetadataQueryUbiquitousDocumentsScope ]
             query.predicate = NSPredicate(format: "%K LIKE '*'", argumentArray: [ NSMetadataItemFSNameKey ])
 
-            _observers += query.onChange("results") {
+            _observers += [query.onChange("results") {
                 [weak self] change in
                 if let strongSelf = self {
                     if let indexes: AnyObject = change[NSKeyValueChangeIndexesKey] {
@@ -180,7 +180,7 @@ extension DocumentsManager {
                         }
                     }
                 }
-            } // End of query.onChange()
+            }] // End of query.onChange()
 
             // Start the query in the next run loop, in order to ensure that
             // documentsListReset() is called before any query results KVO fires.
@@ -205,7 +205,7 @@ extension DocumentsManager: iCloudManagerDelegate {
 
     func gotAccessToUbiquityContainer() {
         assert(_iCloudManager.isLoggedIntoiCloud)
-        assert(_iCloudManager.ubiquityContainerURL)
+        assert(_iCloudManager.ubiquityContainerURL != nil)
         if (self.isiCloudUsageEnabled) {
             startUsingiCloud()
         }

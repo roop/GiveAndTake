@@ -26,7 +26,7 @@ class ICloudManager {
                 _ubiquityContainerURL = nil
                 _delegate?.loggedOutOfiCloud?()
             case let (_, _):
-                if (oldValue?.isEqual(_ubiquityIdentityToken)) {
+                if (oldValue != nil && oldValue!.isEqual(_ubiquityIdentityToken)) {
                     return
                 } else {
                     _ubiquityContainerURL = nil
@@ -57,7 +57,7 @@ class ICloudManager {
     // Public read-only properties
 
     var isLoggedIntoiCloud: Bool {
-        if (_ubiquityIdentityToken) { return true } else { return false }
+        if (_ubiquityIdentityToken != nil) { return true } else { return false }
     }
 
     var ubiquityContainerURL: NSURL? {
@@ -80,7 +80,7 @@ class ICloudManager {
                     strongSelf._ubiquityIdentityToken = NSFileManager.defaultManager().ubiquityIdentityToken
                 }
             })
-        if (_ubiquityIdentityToken) {
+        if (_ubiquityIdentityToken != nil) {
             self.getUbiquityContainerURLInBackgroundQueue()
         }
     }
@@ -92,7 +92,7 @@ class ICloudManager {
     // Methods
 
     func getUbiquityContainerURLInBackgroundQueue() {
-        if (_ubiquityIdentityToken) {
+        if (_ubiquityIdentityToken != nil) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 // In background thread
                 var url = NSFileManager.defaultManager().URLForUbiquityContainerIdentifier(ICLOUD_CONTAINER_ID)

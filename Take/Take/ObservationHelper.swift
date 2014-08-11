@@ -59,7 +59,7 @@ class KeyValueObserver: NSObject {
     }
 
     override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!,
-        change: [NSObject : AnyObject]!, context: UnsafePointer<()>) {
+        change: [NSObject : AnyObject]!, context: UnsafeMutablePointer<()>) {
 
         assert(keyPath == _keyPath)
         _block(change: change)

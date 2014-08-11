@@ -18,6 +18,11 @@ class DocCollectionViewController: UIViewController {
         _documentsManager.documentsListDisplayDelegate = self
     }
 
+    required init(coder: NSCoder) {
+        // Explicitly disallow initing from an archive
+        fatalError("Object of type DocCollectionViewController cannot be initialized with an NSCoder")
+    }
+
     override func loadView() {
         var flowLayout: UICollectionViewFlowLayout = {
             var layout = UICollectionViewFlowLayout()
@@ -107,7 +112,7 @@ class DocCollectionViewCell: UICollectionViewCell {
                 var subtitle = ""
                 var isUbiquitous: AnyObject?
                 docURL.getPromisedItemResourceValue(&isUbiquitous, forKey: NSURLIsUbiquitousItemKey, error: nil)
-                if (isUbiquitous) {
+                if (isUbiquitous as NSNumber > 0) {
                     var isUploading: AnyObject?, isDownloading: AnyObject?
                     docURL.getPromisedItemResourceValue(&isUploading, forKey: NSURLUbiquitousItemIsUploadingKey, error: nil)
                     docURL.getPromisedItemResourceValue(&isDownloading, forKey: NSURLUbiquitousItemIsDownloadingKey, error: nil)
@@ -141,7 +146,7 @@ class DocCollectionViewCell: UICollectionViewCell {
         return f
         }()
 
-    init(frame: CGRect) {
+    override init(frame: CGRect) {
         super.init(frame: frame)
         _nameLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
         _timestampLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleSubheadline)
@@ -169,6 +174,11 @@ class DocCollectionViewCell: UICollectionViewCell {
                 .Anchor(.Bottom, _nameLabel.top())
                 ])
         )
+    }
+
+    required init(coder: NSCoder) {
+        // Explicitly disallow initing from an archive
+        fatalError("Object of type DocCollectionViewCell cannot be initialized with an NSCoder")
     }
 
     class func createWhiteCenteredLabel() -> UILabel {

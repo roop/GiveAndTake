@@ -11,7 +11,7 @@ import UIKit
 class MainViewController: UIViewController {
     var _documentsManager: DocumentsManager!
 
-    init() {
+    override init() {
         super.init(nibName: nil, bundle: nil)
         _documentsManager = DocumentsManager(isiCloudUsageEnabled: true)
 
@@ -20,6 +20,11 @@ class MainViewController: UIViewController {
             UIBarButtonItem(barButtonSystemItem: .Add,
                 target: self, action: "addButtonTapped:")
         ]
+    }
+
+    required init(coder: NSCoder) {
+        // Explicitly disallow initing from an archive
+        fatalError("Object of type MainViewController cannot be initialized with an NSCoder")
     }
 
     override func loadView() {
