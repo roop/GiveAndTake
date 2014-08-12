@@ -105,29 +105,32 @@ class DocCollectionViewCell: UICollectionViewCell {
                 _nameLabel.text = ""
                 _timestampLabel.text = ""
 
-                var localizedName: AnyObject?, modifiedDate: AnyObject?
-                docURL.getPromisedItemResourceValue(&localizedName, forKey: NSURLLocalizedNameKey, error: nil)
-                docURL.getPromisedItemResourceValue(&modifiedDate, forKey: NSURLContentModificationDateKey, error: nil)
+                let docMetaData = docURL.promisedItemResourceValuesForKeys(
+                    [   NSURLLocalizedNameKey,
+                        NSURLContentModificationDateKey,
+                        NSURLIsUbiquitousItemKey,
+                        NSURLUbiquitousItemDownloadingStatusKey,
+                        NSURLUbiquitousItemIsDownloadingKey,
+                        NSURLUbiquitousItemIsUploadingKey
+                    ], error: nil)
+
+                let isUbiquitousDocument: Bool = ((docMetaData[NSURLIsUbiquitousItemKey] as? NSNumber ?? 0)  > 0)
+                let isDownloading: Bool = ((docMetaData[NSURLUbiquitousItemIsDownloadingKey] as? NSNumber ?? 0)  > 0)
+                let isUploading: Bool = ((docMetaData[NSURLUbiquitousItemIsUploadingKey] as? NSNumber ?? 0)  > 0)
 
                 var subtitle = ""
-                var isUbiquitous: AnyObject?
-                docURL.getPromisedItemResourceValue(&isUbiquitous, forKey: NSURLIsUbiquitousItemKey, error: nil)
-                if (isUbiquitous as NSNumber > 0) {
-                    var isUploading: AnyObject?, isDownloading: AnyObject?
-                    docURL.getPromisedItemResourceValue(&isUploading, forKey: NSURLUbiquitousItemIsUploadingKey, error: nil)
-                    docURL.getPromisedItemResourceValue(&isDownloading, forKey: NSURLUbiquitousItemIsDownloadingKey, error: nil)
-                    if (isDownloading as NSNumber).boolValue {
+                if (isUbiquitousDocument) {
+                    if (isDownloading) {
                         subtitle = "Downloading"
-                    } else if (isUploading as NSNumber).boolValue {
+                    } else if (isUploading) {
                         subtitle = "Uploading"
-                    } else {
-                        subtitle = _timestampFormatter.stringFromDate(modifiedDate as NSDate)
                     }
-                } else {
-                    subtitle = _timestampFormatter.stringFromDate(modifiedDate as NSDate)
+                }
+                if (subtitle.isEmpty) {
+                    subtitle = _timestampFormatter.stringFromDate(docMetaData[NSURLContentModificationDateKey] as NSDate)
                 }
 
-                _nameLabel.text = localizedName as NSString
+                _nameLabel.text = docMetaData[NSURLLocalizedNameKey] as NSString
                 _timestampLabel.text = subtitle
 
             }
