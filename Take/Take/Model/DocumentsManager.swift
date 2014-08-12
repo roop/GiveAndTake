@@ -167,16 +167,22 @@ extension DocumentsManager {
                 [weak self] change in
                 if let strongSelf = self {
                     if let indexes: AnyObject = change[NSKeyValueChangeIndexesKey] {
-                        var indexes = change[NSKeyValueChangeIndexesKey] as NSMutableIndexSet
-                        switch (change[ NSKeyValueChangeKindKey ] as NSNumber) {
-                        case NSKeyValueChange.Insertion.toRaw():
-                            strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(indexes)
-                        case NSKeyValueChange.Removal.toRaw():
-                            strongSelf.documentsListDisplayDelegate?.documentsRemovedAtIndexes?(indexes)
-                        case NSKeyValueChange.Replacement.toRaw():
-                            strongSelf.documentsListDisplayDelegate?.documentsChangedAtIndexes?(indexes)
-                        default:
-                            break // Nothing to do
+                        let indexes = change[NSKeyValueChangeIndexesKey] as NSMutableIndexSet
+                        // Comments above observeValueForKeyPath() says:
+                        // The change dictionary always contains an NSKeyValueChangeKindKey entry whose value
+                        // is an NSNumber wrapping an NSKeyValueChange (use -[NSNumber unsignedIntegerValue]).
+                        let kindOfChangeUInt = UInt((change[ NSKeyValueChangeKindKey ] as NSNumber).unsignedIntegerValue)
+                        if let kindOfChange = NSKeyValueChange.fromRaw(kindOfChangeUInt) {
+                            switch kindOfChange {
+                            case .Insertion:
+                                strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(indexes)
+                            case .Removal:
+                                strongSelf.documentsListDisplayDelegate?.documentsRemovedAtIndexes?(indexes)
+                            case .Replacement:
+                                strongSelf.documentsListDisplayDelegate?.documentsChangedAtIndexes?(indexes)
+                            default:
+                                break // Nothing to do
+                            }
                         }
                     }
                 }
