@@ -27,7 +27,7 @@ class DocCollectionViewController: UIViewController {
         var flowLayout: UICollectionViewFlowLayout = {
             var layout = UICollectionViewFlowLayout()
             layout.scrollDirection = .Vertical
-            layout.itemSize = CGSize(width: 100, height: 180)
+            layout.itemSize = CGSize(width: 120, height: 220)
             layout.minimumLineSpacing = 40
             layout.minimumInteritemSpacing = 40
             return layout
