@@ -67,9 +67,18 @@ extension DocCollectionViewController: DocumentsListDisplayDelegate {
 extension DocCollectionViewController: UICollectionViewDelegate {
     func collectionView(collectionView: UICollectionView!, didSelectItemAtIndexPath indexPath: NSIndexPath!) {
         var documentURL = _documentsManager.documentURLatIndex(indexPath.item)
-        var textEditorVC = TextEditorViewController(documentsManager: _documentsManager,
-            documentURL: documentURL)
-        self.navigationController.pushViewController(textEditorVC, animated: true)
+        let documentMetaData = documentURL.promisedItemResourceValuesForKeys(
+            [   NSURLIsUbiquitousItemKey,
+                NSURLUbiquitousItemDownloadingStatusKey
+            ], error: nil)
+        let ubiquityStatus = DocumentUbiquityStatus(urlMetaData: documentMetaData)
+        if (!ubiquityStatus.documentIsUbiquitous || ubiquityStatus.documentIsUpToDate) {
+            var textEditorVC = TextEditorViewController(documentsManager: _documentsManager,
+                documentURL: documentURL)
+            self.navigationController.pushViewController(textEditorVC, animated: true)
+        } else {
+            NSFileManager.defaultManager().startDownloadingUbiquitousItemAtURL(documentURL, error: nil)
+        }
     }
 }
 
