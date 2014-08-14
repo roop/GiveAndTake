@@ -42,7 +42,7 @@ class DocCollectionViewController: UIViewController {
     }
 }
 
-extension DocCollectionViewController: DocumentsListDisplayDelegate {
+extension DocCollectionViewController: DocumentsManagerListDisplayDelegate {
     func documentsAddedAtIndexes(indexes: NSIndexSet) {
         var indexPaths: [NSIndexPath] = []
         indexes.enumerateIndexesUsingBlock { i, _ in

@@ -10,7 +10,7 @@ import UIKit
 
 class DocumentsManager: NSObject {
 
-    weak var documentsListDisplayDelegate: DocumentsListDisplayDelegate?
+    weak var documentsListDisplayDelegate: DocumentsManagerListDisplayDelegate?
 
     var isiCloudAvailable: Bool {
         return _iCloudManager.isiCloudAvailable
@@ -255,7 +255,7 @@ extension DocumentsManager {
     }
 }
 
-@objc protocol DocumentsListDisplayDelegate {
+@objc protocol DocumentsManagerListDisplayDelegate {
     optional func documentsAddedAtIndexes(indexes: NSIndexSet)
     optional func documentsRemovedAtIndexes(indexes: NSIndexSet)
     optional func documentsChangedAtIndexes(indexes: NSIndexSet)
