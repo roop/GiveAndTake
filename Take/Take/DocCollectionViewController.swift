@@ -114,19 +114,15 @@ class DocCollectionViewCell: UICollectionViewCell {
                         NSURLUbiquitousItemIsUploadingKey
                     ], error: nil)
 
-                let isUbiquitousDocument: Bool = ((docMetaData[NSURLIsUbiquitousItemKey] as? NSNumber ?? 0)  > 0)
-                let isDownloading: Bool = ((docMetaData[NSURLUbiquitousItemIsDownloadingKey] as? NSNumber ?? 0)  > 0)
-                let isUploading: Bool = ((docMetaData[NSURLUbiquitousItemIsUploadingKey] as? NSNumber ?? 0)  > 0)
-                let isUpToDate: Bool = ((docMetaData[NSURLUbiquitousItemDownloadingStatusKey] as? NSString)?
-                    .isEqualToString(NSURLUbiquitousItemDownloadingStatusCurrent)) ?? false
+                let ubiquityStatus = DocumentUbiquityStatus(urlMetaData: docMetaData)
 
                 var subtitle = ""
-                if (isUbiquitousDocument) {
-                    if (isDownloading) {
+                if (ubiquityStatus.documentIsUbiquitous) {
+                    if (ubiquityStatus.documentIsDownloading) {
                         subtitle = "Downloading"
-                    } else if (isUploading) {
+                    } else if (ubiquityStatus.documentIsUploading) {
                         subtitle = "Uploading"
-                    } else if (!isUpToDate) {
+                    } else if (!ubiquityStatus.documentIsUpToDate) {
                         subtitle = "Tap to download"
                     }
                 }
@@ -193,5 +189,19 @@ class DocCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .Center
         label.textColor = UIColor.whiteColor()
         return label
+    }
+}
+
+struct DocumentUbiquityStatus {
+    let documentIsUbiquitous: Bool
+    let documentIsDownloading: Bool
+    let documentIsUploading: Bool
+    let documentIsUpToDate: Bool
+    init(urlMetaData: [NSObject : AnyObject]) {
+        documentIsUbiquitous = ((urlMetaData[NSURLIsUbiquitousItemKey] as? NSNumber ?? 0)  > 0)
+        documentIsDownloading = ((urlMetaData[NSURLUbiquitousItemIsDownloadingKey] as? NSNumber ?? 0)  > 0)
+        documentIsUploading = ((urlMetaData[NSURLUbiquitousItemIsUploadingKey] as? NSNumber ?? 0)  > 0)
+        documentIsUpToDate = ((urlMetaData[NSURLUbiquitousItemDownloadingStatusKey] as? NSString)?
+            .isEqualToString(NSURLUbiquitousItemDownloadingStatusCurrent)) ?? false
     }
 }
