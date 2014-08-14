@@ -137,10 +137,10 @@ class DocCollectionViewCell: UICollectionViewCell {
         }
     }
 
-    var _nameLabel: UILabel = DocCollectionViewCell.createWhiteCenteredLabel()
-    var _timestampLabel: UILabel = DocCollectionViewCell.createWhiteCenteredLabel()
-    var _thumbnailContainer = UIView()
-    var _thumbnailPlaceholder = UIView()
+    let _nameLabel: UILabel = DocCollectionViewCell.createWhiteCenteredLabel()
+    let _timestampLabel: UILabel = DocCollectionViewCell.createWhiteCenteredLabel()
+    let _thumbnailContainer = UIView()
+    let _thumbnailPlaceholder = UIView()
 
     lazy var _timestampFormatter: NSDateFormatter = {
         let f = NSDateFormatter()
