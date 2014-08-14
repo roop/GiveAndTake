@@ -117,6 +117,8 @@ class DocCollectionViewCell: UICollectionViewCell {
                 let isUbiquitousDocument: Bool = ((docMetaData[NSURLIsUbiquitousItemKey] as? NSNumber ?? 0)  > 0)
                 let isDownloading: Bool = ((docMetaData[NSURLUbiquitousItemIsDownloadingKey] as? NSNumber ?? 0)  > 0)
                 let isUploading: Bool = ((docMetaData[NSURLUbiquitousItemIsUploadingKey] as? NSNumber ?? 0)  > 0)
+                let isUpToDate: Bool = ((docMetaData[NSURLUbiquitousItemDownloadingStatusKey] as? NSString)?
+                    .isEqualToString(NSURLUbiquitousItemDownloadingStatusCurrent)) ?? false
 
                 var subtitle = ""
                 if (isUbiquitousDocument) {
@@ -124,6 +126,8 @@ class DocCollectionViewCell: UICollectionViewCell {
                         subtitle = "Downloading"
                     } else if (isUploading) {
                         subtitle = "Uploading"
+                    } else if (!isUpToDate) {
+                        subtitle = "Tap to download"
                     }
                 }
                 if (subtitle.isEmpty) {
