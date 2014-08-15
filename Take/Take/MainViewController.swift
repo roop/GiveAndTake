@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MobileCoreServices
 
 class MainViewController: UIViewController {
     var _documentsManager: DocumentsManager!
@@ -18,7 +19,9 @@ class MainViewController: UIViewController {
         self.navigationItem.title = "Take"
         self.navigationItem.rightBarButtonItems = [
             UIBarButtonItem(barButtonSystemItem: .Add,
-                target: self, action: "addButtonTapped:")
+                target: self, action: "addButtonTapped:"),
+            UIBarButtonItem(barButtonSystemItem: .Organize,
+                target: self, action: "documentPickerButtonTapped:")
         ]
     }
 
@@ -43,5 +46,22 @@ class MainViewController: UIViewController {
         self.navigationController.pushViewController(
             TextEditorViewController(documentsManager: _documentsManager),
             animated: true)
+    }
+
+    func documentPickerButtonTapped(sender: UIBarButtonItem!) {
+        var documentUTIs: NSArray = [ kUTTypePlainText as NSString ]
+        var documentPickerVC = UIDocumentPickerViewController(documentTypes: documentUTIs, inMode: .Open)
+        documentPickerVC.delegate = self
+        self.presentViewController(documentPickerVC, animated: true, completion: nil)
+    }
+}
+
+extension MainViewController: UIDocumentPickerDelegate {
+    func documentPicker(controller: UIDocumentPickerViewController!, didPickDocumentAtURL url: NSURL!) {
+        println("Document picked: \(url)")
+    }
+
+    func documentPickerWasCancelled(controller: UIDocumentPickerViewController!) {
+        println("No document picked")
     }
 }
