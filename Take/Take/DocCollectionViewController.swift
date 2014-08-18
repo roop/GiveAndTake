@@ -73,8 +73,7 @@ extension DocCollectionViewController: UICollectionViewDelegate {
             ], error: nil)
         let ubiquityStatus = DocumentUbiquityStatus(urlMetaData: documentMetaData)
         if (!ubiquityStatus.documentIsUbiquitous || ubiquityStatus.documentIsUpToDate) {
-            var textEditorVC = TextEditorViewController(documentsManager: _documentsManager,
-                documentURL: documentURL)
+            var textEditorVC = TextEditorViewController(documentURL: documentURL)
             self.navigationController.pushViewController(textEditorVC, animated: true)
         } else {
             NSFileManager.defaultManager().startDownloadingUbiquitousItemAtURL(documentURL, error: nil)

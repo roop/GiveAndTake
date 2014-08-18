@@ -10,7 +10,7 @@ import UIKit
 
 class TextEditorViewController: UIViewController {
 
-    weak var _documentsManager: DocumentsManager!
+    weak var _documentsManager: DocumentsManager?
     var _document: TextDocument? {
         didSet {
             if (self._view != nil) {
@@ -28,21 +28,27 @@ class TextEditorViewController: UIViewController {
     var _title: NSMutableString = ""
     var _view: UITextView?
 
-    init(documentsManager: DocumentsManager, documentURL: NSURL? = nil) {
+    // Create a text editor to create a new document
+
+    init(documentsManager: DocumentsManager) {
         super.init(nibName: nil, bundle: nil)
         _documentsManager = documentsManager
-        if (documentURL != nil) {
-            var document = TextDocument(fileURL: documentURL)
-            document.openWithCompletionHandler( { (success: Bool) in
-                if (success) {
-                    self._document = document
-                    document.editorDelegate = self
-                    var title = document.localizedName
-                    self._title = title.mutableCopy() as NSMutableString
-                    self.navigationItem.title = title
-                }
-                })
-        }
+    }
+
+    // Create a text editor to open an existing document
+
+    init(documentURL: NSURL) {
+        super.init(nibName: nil, bundle: nil)
+        var document = TextDocument(fileURL: documentURL)
+        document.openWithCompletionHandler( { (success: Bool) in
+            if (success) {
+                self._document = document
+                document.editorDelegate = self
+                var title = document.localizedName
+                self._title = title.mutableCopy() as NSMutableString
+                self.navigationItem.title = title
+            }
+        })
     }
 
     required init(coder: NSCoder) {
@@ -100,7 +106,7 @@ extension TextEditorViewController: UITextViewDelegate {
             if (isDocumentTitleFinalized) {
                 var textContents = (textView.text as NSString).stringByReplacingCharactersInRange(
                     range, withString: text)
-                _documentsManager.createDocument(name: _title,
+                _documentsManager?.createDocument(name: _title,
                     textContents: textContents,
                     completionHandler: { (document: TextDocument?) in
                         if (document != nil && self != nil && self._document == nil) {
@@ -131,7 +137,7 @@ extension TextEditorViewController {
     override func viewWillDisappear(animated: Bool) {
         if (self._document == nil) {
             if (_title.length > 0) {
-                _documentsManager.createDocument(name: _title,
+                _documentsManager?.createDocument(name: _title,
                     textContents: _title,
                     completionHandler: nil)
             }

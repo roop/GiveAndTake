@@ -62,8 +62,7 @@ extension MainViewController: UIDocumentPickerDelegate {
         // disappears first before the text editor appears.
         dispatch_async(dispatch_get_main_queue()) { [weak self] in
             if let strongSelf = self {
-                var textEditorVC = TextEditorViewController(documentsManager: strongSelf._documentsManager,
-                    documentURL: url)
+                var textEditorVC = TextEditorViewController(documentURL: url)
                 strongSelf.navigationController.pushViewController(textEditorVC, animated: true)
             }
         }
