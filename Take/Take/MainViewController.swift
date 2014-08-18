@@ -58,7 +58,15 @@ class MainViewController: UIViewController {
 
 extension MainViewController: UIDocumentPickerDelegate {
     func documentPicker(controller: UIDocumentPickerViewController!, didPickDocumentAtURL url: NSURL!) {
-        println("Document picked: \(url)")
+        // Show the text editor in the next run loop, so that the document picker
+        // disappears first before the text editor appears.
+        dispatch_async(dispatch_get_main_queue()) { [weak self] in
+            if let strongSelf = self {
+                var textEditorVC = TextEditorViewController(documentsManager: strongSelf._documentsManager,
+                    documentURL: url)
+                strongSelf.navigationController.pushViewController(textEditorVC, animated: true)
+            }
+        }
     }
 
     func documentPickerWasCancelled(controller: UIDocumentPickerViewController!) {
