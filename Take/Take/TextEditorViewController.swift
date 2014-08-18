@@ -24,6 +24,7 @@ class TextEditorViewController: UIViewController {
             }
         }
     }
+    var _isDownloadingDocument: Bool = false
 
     var _title: NSMutableString = ""
     var _view: UITextView?
@@ -39,9 +40,20 @@ class TextEditorViewController: UIViewController {
 
     init(documentURL: NSURL) {
         super.init(nibName: nil, bundle: nil)
+        let urlMetaData = documentURL.promisedItemResourceValuesForKeys(
+            [   NSURLIsUbiquitousItemKey,
+                NSURLUbiquitousItemDownloadingStatusKey
+            ], error: nil)
+        var ubiquityStatus = DocumentUbiquityStatus(urlMetaData: urlMetaData)
+        if (ubiquityStatus.documentIsUbiquitous && !ubiquityStatus.documentIsUpToDate) {
+            _isDownloadingDocument = true
+            NSFileManager.defaultManager().startDownloadingUbiquitousItemAtURL(documentURL, error: nil)
+        }
         var document = TextDocument(fileURL: documentURL)
         document.openWithCompletionHandler( { (success: Bool) in
             if (success) {
+                self._isDownloadingDocument = false
+                self._view?.editable = true
                 self._document = document
                 document.editorDelegate = self
                 var title = document.localizedName
@@ -57,7 +69,7 @@ class TextEditorViewController: UIViewController {
     }
 
     override func loadView() {
-        self.navigationItem.title = "Untitled"
+        self.navigationItem.title = (_isDownloadingDocument ? "Downloading ..." : "Untitled")
         _view = {
                     let v = UITextView()
                     v.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
@@ -69,6 +81,9 @@ class TextEditorViewController: UIViewController {
                     }
                     return v
                 }()
+        if (_isDownloadingDocument) {
+            _view?.editable = false
+        }
         self.view = _view! as UIView
     }
 }
