@@ -45,12 +45,14 @@ extension NSObject {
 }
 
 class KeyValueObserver: NSObject {
+    weak var _object: NSObject?
     var _keyPath: String
     var _block: (change: [NSObject : AnyObject]!) -> ()
 
     init(object: NSObject, keyPath: String, options: NSKeyValueObservingOptions,
         block: (change: [NSObject : AnyObject]!) -> ()) {
 
+        _object = object
         _keyPath = keyPath
         _block = block
         super.init()
@@ -67,7 +69,7 @@ class KeyValueObserver: NSObject {
     }
 
     deinit {
-        removeObserver(self, forKeyPath: _keyPath, context: nil)
+        _object?.removeObserver(self, forKeyPath: _keyPath, context: nil)
     }
 }
 
