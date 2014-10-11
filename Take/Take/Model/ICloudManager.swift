@@ -86,7 +86,9 @@ class ICloudManager {
     }
 
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self._iCloudTokenNotificationObserver)
+        if let observer: AnyObject = self._iCloudTokenNotificationObserver {
+            NSNotificationCenter.defaultCenter().removeObserver(observer)
+        }
     }
 
     // Methods
