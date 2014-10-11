@@ -111,7 +111,7 @@ extension DocumentsManager {
                 var error: NSError?
                 let documents = NSFileManager.defaultManager().contentsOfDirectoryAtURL(strongSelf._localRootURL,
                     includingPropertiesForKeys: [ NSURLLocalizedNameKey, NSURLAttributeModificationDateKey ],
-                    options: nil, error: &error).sorted( { (url1, url2) -> Bool in
+                    options: nil, error: &error)?.sorted( { (url1, url2) -> Bool in
                         // Sort so we get most recently modified first
                         var error1: NSError?, error2: NSError?
                         var modifiedDate1: AnyObject?, modifiedDate2: AnyObject?
@@ -172,7 +172,7 @@ extension DocumentsManager {
                         // The change dictionary always contains an NSKeyValueChangeKindKey entry whose value
                         // is an NSNumber wrapping an NSKeyValueChange (use -[NSNumber unsignedIntegerValue]).
                         let kindOfChangeUInt = UInt((change[ NSKeyValueChangeKindKey ] as NSNumber).unsignedIntegerValue)
-                        if let kindOfChange = NSKeyValueChange.fromRaw(kindOfChangeUInt) {
+                        if let kindOfChange = NSKeyValueChange(rawValue: kindOfChangeUInt) {
                             switch kindOfChange {
                             case .Insertion:
                                 strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(indexes)
@@ -231,27 +231,30 @@ extension DocumentsManager {
         completionHandler: ((TextDocument?) -> Void)?) {
         var isUsingUbiquitousContainer = self.isUsingUbiquitousContainer
         var rootURL: NSURL = (isUsingUbiquitousContainer ? _ubiquitousRootURL! : _localRootURL)
-        var fileName = name.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
+        var fileName = name.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)?
                            .stringByAppendingPathExtension("txt")
-        var url = NSURL(string: fileName, relativeToURL: rootURL)
-        var document = TextDocument(fileURL: url)
-        document.textContents = textContents.mutableCopy() as NSMutableString
-        document.saveToURL(document.fileURL, forSaveOperation: .ForCreating,
-            completionHandler: { [weak self] (fileCreated: Bool) in
-                if (fileCreated) {
-                    if let strongSelf = self {
-                        if (isUsingUbiquitousContainer) {
-                            // Nothing to do. The NSMetaDataQuery will update automatically.
-                        } else {
-                            strongSelf._localDocumentsList.insert(url, atIndex: 0)
-                            strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(NSIndexSet(index: 0))
+        if (fileName == nil) { return; }
+        var url = NSURL(string: fileName!, relativeToURL: rootURL)
+        if (url == nil) { return; }
+        if let document = TextDocument(fileURL: url!) {
+            document.textContents = textContents.mutableCopy() as NSMutableString
+            document.saveToURL(document.fileURL, forSaveOperation: .ForCreating,
+                completionHandler: { [weak self] (fileCreated: Bool) in
+                    if (fileCreated) {
+                        if let strongSelf = self {
+                            if (isUsingUbiquitousContainer) {
+                                // Nothing to do. The NSMetaDataQuery will update automatically.
+                            } else {
+                                strongSelf._localDocumentsList.insert(url!, atIndex: 0)
+                                strongSelf.documentsListDisplayDelegate?.documentsAddedAtIndexes?(NSIndexSet(index: 0))
+                            }
                         }
+                        completionHandler?(document)
+                    } else {
+                        completionHandler?(nil)
                     }
-                    completionHandler?(document)
-                } else {
-                    completionHandler?(nil)
-                }
             })
+        }
     }
 }
 
