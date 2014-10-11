@@ -13,15 +13,15 @@ class TextDocument: UIDocument {
     var textContents: NSMutableString = ""
     weak var editorDelegate: TextDocumentEditorDelegate?
 
-    override func loadFromContents(contents: AnyObject!, ofType typeName: String!, error outError: AutoreleasingUnsafeMutablePointer<NSError?>) -> Bool {
+    override func loadFromContents(contents: AnyObject, ofType typeName: String, error outError: AutoreleasingUnsafeMutablePointer<NSError?>) -> Bool {
         if UTTypeConformsTo(typeName as NSString, kUTTypePlainText) > 0 {
-            self.textContents = NSMutableString(data: contents as NSData, encoding: NSUTF8StringEncoding)
+            self.textContents = NSMutableString(data: contents as NSData, encoding: NSUTF8StringEncoding) ?? ""
             return true
         }
         return false
     }
 
-    override func contentsForType(typeName: String!, error outError: AutoreleasingUnsafeMutablePointer<NSError?>) -> AnyObject! {
+    override func contentsForType(typeName: String, error outError: AutoreleasingUnsafeMutablePointer<NSError?>) -> AnyObject? {
         if UTTypeConformsTo(typeName as NSString, kUTTypePlainText) > 0 {
             var data = textContents.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
             return data
@@ -29,7 +29,7 @@ class TextDocument: UIDocument {
         return nil
     }
 
-    override var fileType: String! {
+    override var fileType: String {
         return kUTTypeUTF8PlainText as NSString
     }
 
