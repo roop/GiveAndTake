@@ -43,32 +43,33 @@ class MainViewController: UIViewController {
     }
 
     func addButtonTapped(sender: UIBarButtonItem!) {
-        self.navigationController.pushViewController(
+        self.navigationController?.pushViewController(
             TextEditorViewController(documentsManager: _documentsManager),
             animated: true)
     }
 
     func documentPickerButtonTapped(sender: UIBarButtonItem!) {
         var documentUTIs: NSArray = [ kUTTypePlainText as NSString ]
-        var documentPickerVC = UIDocumentPickerViewController(documentTypes: documentUTIs, inMode: .Open)
-        documentPickerVC.delegate = self
-        self.presentViewController(documentPickerVC, animated: true, completion: nil)
+        if let documentPickerVC = UIDocumentPickerViewController(documentTypes: documentUTIs, inMode: .Open) {
+            documentPickerVC.delegate = self
+            self.presentViewController(documentPickerVC, animated: true, completion: nil)
+        }
     }
 }
 
 extension MainViewController: UIDocumentPickerDelegate {
-    func documentPicker(controller: UIDocumentPickerViewController!, didPickDocumentAtURL url: NSURL!) {
+    func documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL url: NSURL) {
         // Show the text editor in the next run loop, so that the document picker
         // disappears first before the text editor appears.
         dispatch_async(dispatch_get_main_queue()) { [weak self] in
             if let strongSelf = self {
                 var textEditorVC = TextEditorViewController(documentURL: url)
-                strongSelf.navigationController.pushViewController(textEditorVC, animated: true)
+                strongSelf.navigationController?.pushViewController(textEditorVC, animated: true)
             }
         }
     }
 
-    func documentPickerWasCancelled(controller: UIDocumentPickerViewController!) {
+    func documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
         println("No document picked")
     }
 }
