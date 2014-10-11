@@ -60,8 +60,8 @@ class KeyValueObserver: NSObject {
 
     }
 
-    override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!,
-        change: [NSObject : AnyObject]!, context: UnsafeMutablePointer<()>) {
+    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject,
+        change: [NSObject : AnyObject], context: UnsafeMutablePointer<()>) {
 
         assert(keyPath == _keyPath)
         _block(change: change)
@@ -85,6 +85,8 @@ class NotificationObserver: NSObject {
     }
 
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(_observerObject)
+        if let observer: AnyObject = _observerObject {
+            NSNotificationCenter.defaultCenter().removeObserver(observer)
+        }
     }
 }
