@@ -51,5 +51,5 @@ Before you can run Take, you might have to do the following:
 
 iOS 8 on iPad, on the Simulator or a real iPad. Take has not yet been tested on the iPhone.
 
-Requires Xcode 6 Beta 5.
+Requires Xcode 6.1.
 
