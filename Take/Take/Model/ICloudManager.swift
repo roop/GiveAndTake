@@ -97,7 +97,7 @@ class ICloudManager {
         if (_ubiquityIdentityToken != nil) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 // In background thread
-                var url = NSFileManager.defaultManager().URLForUbiquityContainerIdentifier(nil)
+                let url = NSFileManager.defaultManager().URLForUbiquityContainerIdentifier(nil)
                 dispatch_async(dispatch_get_main_queue()) {
                     // In main thread
                     self._ubiquityContainerURL = url

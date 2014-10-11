@@ -59,7 +59,7 @@ extension UIViewController {
 
 extension UIView {
     func addSubviewsWithConstraints(subviews: (UIView, Array<LayoutInfo>)...) -> Void {
-        var currentSubviews: NSArray = self.subviews
+        let currentSubviews: NSArray = self.subviews
 
         iteratingOverSubviews: for subviewDataTuple in subviews {
 

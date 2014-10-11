@@ -23,7 +23,7 @@ class TextDocument: UIDocument {
 
     override func contentsForType(typeName: String, error outError: AutoreleasingUnsafeMutablePointer<NSError?>) -> AnyObject? {
         if UTTypeConformsTo(typeName as NSString, kUTTypePlainText) > 0 {
-            var data = textContents.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
+            let data = textContents.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
             return data
         }
         return nil

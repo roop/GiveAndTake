@@ -24,7 +24,7 @@ class DocCollectionViewController: UIViewController {
     }
 
     override func loadView() {
-        var flowLayout: UICollectionViewFlowLayout = {
+        let flowLayout: UICollectionViewFlowLayout = {
             var layout = UICollectionViewFlowLayout()
             layout.scrollDirection = .Vertical
             layout.itemSize = CGSize(width: 120, height: 220)
@@ -67,7 +67,7 @@ extension DocCollectionViewController: DocumentsManagerListDisplayDelegate {
 
 extension DocCollectionViewController: UICollectionViewDelegate {
     func collectionView(collectionView: UICollectionView!, didSelectItemAtIndexPath indexPath: NSIndexPath!) {
-        var documentURL = _documentsManager.documentURLatIndex(indexPath.item)
+        let documentURL = _documentsManager.documentURLatIndex(indexPath.item)
         let documentMetaData = documentURL.promisedItemResourceValuesForKeys(
             [   NSURLIsUbiquitousItemKey,
                 NSURLUbiquitousItemDownloadingStatusKey

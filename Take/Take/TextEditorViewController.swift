@@ -44,7 +44,7 @@ class TextEditorViewController: UIViewController {
             [   NSURLIsUbiquitousItemKey,
                 NSURLUbiquitousItemDownloadingStatusKey
             ], error: nil)
-        var ubiquityStatus = DocumentUbiquityStatus(urlMetaData: urlMetaData)
+        let ubiquityStatus = DocumentUbiquityStatus(urlMetaData: urlMetaData)
         if (ubiquityStatus.documentIsUbiquitous && !ubiquityStatus.documentIsUpToDate) {
             _isDownloadingDocument = true
             NSFileManager.defaultManager().startDownloadingUbiquitousItemAtURL(documentURL, error: nil)
@@ -120,7 +120,7 @@ extension TextEditorViewController: UITextViewDelegate {
             // Once the user types past the first line,
             // create the document
             if (isDocumentTitleFinalized) {
-                var textContents = (textView.text as NSString).stringByReplacingCharactersInRange(
+                let textContents = (textView.text as NSString).stringByReplacingCharactersInRange(
                     range, withString: text)
                 _documentsManager?.createDocument(name: _title,
                     textContents: textContents,

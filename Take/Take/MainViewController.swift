@@ -49,7 +49,7 @@ class MainViewController: UIViewController {
     }
 
     func documentPickerButtonTapped(sender: UIBarButtonItem!) {
-        var documentUTIs: NSArray = [ kUTTypePlainText as NSString ]
+        let documentUTIs: NSArray = [ kUTTypePlainText as NSString ]
         if let documentPickerVC = UIDocumentPickerViewController(documentTypes: documentUTIs, inMode: .Open) {
             documentPickerVC.delegate = self
             self.presentViewController(documentPickerVC, animated: true, completion: nil)

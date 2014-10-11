@@ -141,7 +141,7 @@ extension DocumentsManager {
     }
 
     func ubiquitousDocumentURLatIndex(i: Int) -> NSURL {
-        var mdItem: NSMetadataItem = _ubiquitousDocumentsQuery.resultAtIndex(i) as NSMetadataItem
+        let mdItem: NSMetadataItem = _ubiquitousDocumentsQuery.resultAtIndex(i) as NSMetadataItem
         return mdItem.valueForAttribute(NSMetadataItemURLKey) as NSURL
     }
 
@@ -191,7 +191,7 @@ extension DocumentsManager {
             // Start the query in the next run loop, in order to ensure that
             // documentsListReset() is called before any query results KVO fires.
             dispatch_async(dispatch_get_main_queue()) {
-                var ok = self._ubiquitousDocumentsQuery.startQuery()
+                let ok = self._ubiquitousDocumentsQuery.startQuery()
                 if (!ok) {
                     println("Error starting NSMetaDataQuery")
                 } else {
@@ -229,12 +229,12 @@ extension DocumentsManager: iCloudManagerDelegate {
 extension DocumentsManager {
     func createDocument(#name: NSString, textContents: NSString,
         completionHandler: ((TextDocument?) -> Void)?) {
-        var isUsingUbiquitousContainer = self.isUsingUbiquitousContainer
-        var rootURL: NSURL = (isUsingUbiquitousContainer ? _ubiquitousRootURL! : _localRootURL)
-        var fileName = name.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)?
+        let isUsingUbiquitousContainer = self.isUsingUbiquitousContainer
+        let rootURL: NSURL = (isUsingUbiquitousContainer ? _ubiquitousRootURL! : _localRootURL)
+        let fileName = name.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)?
                            .stringByAppendingPathExtension("txt")
         if (fileName == nil) { return; }
-        var url = NSURL(string: fileName!, relativeToURL: rootURL)
+        let url = NSURL(string: fileName!, relativeToURL: rootURL)
         if (url == nil) { return; }
         if let document = TextDocument(fileURL: url!) {
             document.textContents = textContents.mutableCopy() as NSMutableString
