@@ -49,18 +49,19 @@ class TextEditorViewController: UIViewController {
             _isDownloadingDocument = true
             NSFileManager.defaultManager().startDownloadingUbiquitousItemAtURL(documentURL, error: nil)
         }
-        var document = TextDocument(fileURL: documentURL)
-        document.openWithCompletionHandler( { (success: Bool) in
-            if (success) {
-                self._isDownloadingDocument = false
-                self._view?.editable = true
-                self._document = document
-                document.editorDelegate = self
-                var title = document.localizedName
-                self._title = title.mutableCopy() as NSMutableString
-                self.navigationItem.title = title
-            }
-        })
+        if let document = TextDocument(fileURL: documentURL) {
+            document.openWithCompletionHandler( { (success: Bool) in
+                if (success) {
+                    self._isDownloadingDocument = false
+                    self._view?.editable = true
+                    self._document = document
+                    document.editorDelegate = self
+                    var title = document.localizedName
+                    self._title = title.mutableCopy() as NSMutableString
+                    self.navigationItem.title = title
+                }
+            })
+        }
     }
 
     required init(coder: NSCoder) {
@@ -124,7 +125,7 @@ extension TextEditorViewController: UITextViewDelegate {
                 _documentsManager?.createDocument(name: _title,
                     textContents: textContents,
                     completionHandler: { (document: TextDocument?) in
-                        if (document != nil && self != nil && self._document == nil) {
+                        if (document != nil && self._document == nil) {
                             self._document = document
                             println("Created")
                         }
