@@ -205,11 +205,11 @@ struct DocumentUbiquityStatus {
     let documentIsDownloading: Bool
     let documentIsUploading: Bool
     let documentIsUpToDate: Bool
-    init(urlMetaData: [NSObject : AnyObject]) {
-        documentIsUbiquitous = ((urlMetaData[NSURLIsUbiquitousItemKey] as? NSNumber ?? 0)  > 0)
-        documentIsDownloading = ((urlMetaData[NSURLUbiquitousItemIsDownloadingKey] as? NSNumber ?? 0)  > 0)
-        documentIsUploading = ((urlMetaData[NSURLUbiquitousItemIsUploadingKey] as? NSNumber ?? 0)  > 0)
-        documentIsUpToDate = ((urlMetaData[NSURLUbiquitousItemDownloadingStatusKey] as? NSString)?
+    init(urlMetaData: [NSObject : AnyObject]?) {
+        documentIsUbiquitous = ((urlMetaData?[NSURLIsUbiquitousItemKey] as? NSNumber ?? 0).intValue > 0)
+        documentIsDownloading = ((urlMetaData?[NSURLUbiquitousItemIsDownloadingKey] as? NSNumber ?? 0).intValue > 0)
+        documentIsUploading = ((urlMetaData?[NSURLUbiquitousItemIsUploadingKey] as? NSNumber ?? 0).intValue > 0)
+        documentIsUpToDate = ((urlMetaData?[NSURLUbiquitousItemDownloadingStatusKey] as? NSString)?
             .isEqualToString(NSURLUbiquitousItemDownloadingStatusCurrent)) ?? false
     }
 }
