@@ -32,13 +32,14 @@ class DocCollectionViewController: UIViewController {
             layout.minimumInteritemSpacing = 40
             return layout
             }()
-        var view = UICollectionView(frame: CGRect(), collectionViewLayout: flowLayout)
-        view.backgroundColor = UIColor.grayColor()
-        view.registerClass(DocCollectionViewCell.self, forCellWithReuseIdentifier: "DocCollectionCell")
-        _dataSource = DocCollectionViewDataSource(documentsManager: _documentsManager)
-        view.dataSource = _dataSource
-        view.delegate = self
-        self.view = view
+        if let view = UICollectionView(frame: CGRect(), collectionViewLayout: flowLayout) {
+            view.backgroundColor = UIColor.grayColor()
+            view.registerClass(DocCollectionViewCell.self, forCellWithReuseIdentifier: "DocCollectionCell")
+            _dataSource = DocCollectionViewDataSource(documentsManager: _documentsManager)
+            view.dataSource = _dataSource
+            view.delegate = self
+            self.view = view
+        }
     }
 }
 
@@ -74,7 +75,7 @@ extension DocCollectionViewController: UICollectionViewDelegate {
         let ubiquityStatus = DocumentUbiquityStatus(urlMetaData: documentMetaData)
         if (!ubiquityStatus.documentIsUbiquitous || ubiquityStatus.documentIsUpToDate) {
             var textEditorVC = TextEditorViewController(documentURL: documentURL)
-            self.navigationController.pushViewController(textEditorVC, animated: true)
+            self.navigationController?.pushViewController(textEditorVC, animated: true)
         } else {
             NSFileManager.defaultManager().startDownloadingUbiquitousItemAtURL(documentURL, error: nil)
         }
@@ -89,14 +90,14 @@ class DocCollectionViewDataSource: NSObject, UICollectionViewDataSource {
         _documentsManager = documentsManager
     }
 
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView!) -> Int {
+    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
     }
-    func collectionView(collectionView: UICollectionView!, numberOfItemsInSection _: Int) -> Int {
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection _: Int) -> Int {
         return _documentsManager.documentURLCount()
     }
-    func collectionView(collectionView: UICollectionView!,
-        cellForItemAtIndexPath indexPath: NSIndexPath!) -> UICollectionViewCell! {
+    func collectionView(collectionView: UICollectionView,
+        cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         var cell = collectionView.dequeueReusableCellWithReuseIdentifier("DocCollectionCell",
             forIndexPath: indexPath) as DocCollectionViewCell
         assert(indexPath.section == 0)
@@ -135,11 +136,11 @@ class DocCollectionViewCell: UICollectionViewCell {
                     }
                 }
                 if (subtitle.isEmpty) {
-                    subtitle = _timestampFormatter.stringFromDate(docMetaData[NSURLContentModificationDateKey] as NSDate)
+                    subtitle = _timestampFormatter.stringFromDate(docMetaData?[NSURLContentModificationDateKey] as NSDate)
                 }
 
-                _nameLabel.text = docMetaData[NSURLLocalizedNameKey] as NSString
-                _timestampLabel.text = subtitle
+                _nameLabel.text = docMetaData?[NSURLLocalizedNameKey] as NSString ?? ""
+                _timestampLabel.text = subtitle ?? ""
 
             }
         }
